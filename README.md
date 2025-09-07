@@ -1,14 +1,5 @@
 <!-- Dont forget to update README before making any new changes or introducing any new dependencies -->
 
-# SIH25
-This is a repositiory made for sih25
-
----
-
-## Set-up instructions
-- Install 
-
-
 # SIH25 – QR generation logic
 This backend generates **unique QR codes** for products.  
 It uses [uv](https://docs.astral.sh/uv/) (a fast Python package manager) and [qrcode](https://pypi.org/project/qrcode/).  
