@@ -1,7 +1,3 @@
-Here is a clean, updated README file with an added **Notes & Common Issues** section summarizing the dependencies and errors you faced, along with recommended fixes and best practices.
-
-***
-
 # Project README
 
 ## Overview
@@ -151,3 +147,4 @@ API server listening on port 3000
 - Implement authentication and secure token workflows.
 
 ***
+
