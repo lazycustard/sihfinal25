@@ -1,0 +1,15 @@
+{
+  "name": "fabric-qr-api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "fabric-network": "2.2.20",
+    "jsonwebtoken": "^9.0.0",
+    "qrcode": "^1.5.4"
+  }
+}
