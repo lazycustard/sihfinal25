@@ -1,4 +1,4 @@
-Here is a complete README file that guides through the entire procedure—from setting up Docker with WSL in VS Code Remote Explorer, configuring the project, running the Node.js/npm server, and accessing the website locally step-by-step:
+Here is a clean, updated README file with an added **Notes & Common Issues** section summarizing the dependencies and errors you faced, along with recommended fixes and best practices.
 
 ***
 
@@ -6,12 +6,7 @@ Here is a complete README file that guides through the entire procedure—from s
 
 ## Overview
 
-This project provides a Node.js backend server that generates QR codes linked to product details pages, with blockchain-backed product tracking using Hyperledger Fabric. This README explains:
-
-1. How to set up Docker on Windows using WSL with VS Code Remote Explorer.
-2. How to clone and configure the project.
-3. How to run the Node.js server locally (inside Docker or local environment).
-4. How to access the website and scan QR codes for product info.
+This project is a Node.js backend providing QR code generation linked to product details pages, integrating with Hyperledger Fabric blockchain for product tracking and finalization.
 
 ***
 
@@ -19,47 +14,35 @@ This project provides a Node.js backend server that generates QR codes linked to
 
 ### Prerequisites
 
-- Windows 10/11 with **WSL 2** installed and enabled.
-- Docker Desktop installed and configured to use WSL 2 backend.
-- VS Code installed with **Remote - WSL** and **Remote - Containers** extensions.
-- Node.js (v16 LTS or newer) installed either in Docker container or WSL environment.
+- Windows 10/11 with **WSL 2** enabled.
+- Docker Desktop configured to use WSL 2 backend.
+- VS Code with **Remote - WSL** and **Remote - Containers** extensions.
+- Node.js v16 LTS or newer installed inside WSL/Docker container.
 
-### Steps
+### Instructions
 
-1. Open VS Code.
-2. Press `Ctrl+Shift+P`, run **Remote-WSL: New Window**, which opens a new VS Code window inside your WSL distro.
-3. Open your project folder inside WSL.
-4. (Optional) To use Docker containerized development, open the **Remote Explorer** tab in VS Code, choose **Containers**, and connect to a running container or create one from your Dockerfile.
+- Open VS Code in WSL mode (`Remote-WSL: New Window`).
+- Open your project folder inside this environment.
+- (Optional) Use Docker container development via VS Code Remote Explorer.
 
 ***
 
 ## 2. Clone and prepare the project
 
-1. Clone the repo or copy project files into your WSL environment.
+```bash
+git clone <repo-url>
+cd <project-folder>
+npm install
+```
 
-   ```bash
-   git clone <your-repo-url>
-   cd <project-folder>
-   ```
-
-2. Install Node.js dependencies
-
-   ```bash
-   npm install
-   ```
-
-3. (Optional) If you want to run your server inside Docker, build and run the Docker container:
-
-   ```bash
-   docker build -t your-project-image .
-   docker run -p 3000:3000 -v $(pwd):/app your-project-image
-   ```
+- Installs all dependencies.
+- Use `npm install --force` only if absolutely necessary.
 
 ***
 
-## 3. Configure environment variables
+## 3. Environment Configuration
 
-Create a `.env` file in your project root (or set OS environment variables) containing:
+Create `.env` in the root with variables:
 
 ```env
 PORT=3000
@@ -72,13 +55,11 @@ QR_JWT_PRIVKEY="your RSA private key PEM string"
 QR_JWT_PUBKEY="your RSA public key PEM string"
 ```
 
-Adjust paths and values accordingly for your Fabric network setup and JWT keys.
+Adjust values accordingly.
 
 ***
 
-## 4. Run the Node.js server
-
-Start the server locally (or inside container):
+## 4. Running the server
 
 ```bash
 npm start
@@ -92,68 +73,64 @@ API server listening on port 3000
 
 ***
 
-## 5. Access the website and test QR codes
+## 5. Testing and Usage
 
-- Open browser at:
-
-  ```
-  http://localhost:3000/
-  ```
-
-- Click **Generate QR Code** button 
-- QR code image appears; scan it with your phone.
-
-- Scanning the QR code opens the hardcoded product details page or your configured URL.
-
-- To test product details page directly:
-
-  ```
-  http://localhost:3000/api/product-details.html
-  ```
+- Visit `http://localhost:3000/` for the QR code generation page.
+- Click **Generate QR Code** to get the QR image.
+- Scan QR with your phone; it opens the configured product details link.
+- Visit `http://localhost:3000/api/product-details.html` to view dummy product info.
 
 ***
 
-## 6. Scan QR codes on your mobile device in the same network
+## 6. Accessing from mobile on same network
 
-- Replace `localhost` with your PC’s IP address in all URLs if scanning from phone:
-
-  ```
-  http://<your-pc-ip>:3000/
-  ```
-
-- Ensure your PC firewall allows incoming connections on port 3000.
-
-- Connect your phone to the same Wi-Fi network.
+- Find your PC's local IP (e.g., `192.168.1.100`).
+- Replace `localhost` in URLs with your IP so phone can access server.
+- Ensure firewall allows port 3000 inbound.
+- Connect phone and PC to same Wi-Fi.
 
 ***
 
-## 7. Extending the project
+## 7. Notes & Common Issues
 
-- Replace hardcoded URLs with your real frontend URLs.
-- Integrate blockchain queries and finalize transactions with Fabric SDK.
-- Add user login flows and JWT verification.
-- Build frontend to show live product history and scan events.
-- Secure all endpoints and JWT keys.
+### npm dependency errors
 
-***
+- Early errors with `ETARGET` and package versions (`@hyperledger/fabric-gateway`) were due to unpublished or unavailable versions on public npm.
+- Resolution: Use stable `fabric-network@2.2.20`.
+- Avoid `npm audit fix --force` as it can downgrade packages causing breaking changes.
+- Use `npm cache clean --force` cautiously to fix corrupt caches.
 
-## Troubleshooting
+### Syntax errors in `qr.js`
 
-- Server not reachable? Check Docker port binding or firewall.
-- NPM install errors? Clear cache and verify Node.js version.
-- QR code not scannable? Try generating and saving PNG files locally.
+- Regex for stripping base64 prefix needed correction:  
+  Incorrect: `^data:image\\/png;base64,`  
+  Correct: `^data:image\/png;base64,`
+
+### Server & Networking Tips
+
+- “Cannot GET /” occurs if no root route is defined.
+- Add root route serving friendly HTML to avoid this.
+- Localhost URLs are not accessible from phone directly.
+- Always replace `localhost` with PC's LAN IP for mobile testing.
+- Consider tools like `ngrok` for public tunnels.
+
+### Debugging
+
+- Use `curl` commands to verify API response headers and content.
+- Run server continuously in one terminal and use another to call APIs.
+- Check firewall and Docker port mappings carefully.
 
 ***
 
 ## Useful commands
 
-| Task                       | Command                                    |
-|----------------------------|--------------------------------------------|
-| Install dependencies        | `npm install`                              |
-| Start server               | `npm start`                                |
-| Restart Docker container    | `docker restart <container_name>`         |
-| Build Docker image          | `docker build -t your-image .`             |
-| Download QR code image      | `curl http://localhost:3000/api/qr/save/test-product` |
+| Task                    | Command                          |
+|-------------------------|---------------------------------|
+| Install dependencies    | `npm install`                   |
+| Clear npm cache         | `npm cache clean --force`       |
+| Start server            | `npm start`                    |
+| Test QR code generation | `curl http://localhost:3000/api/qr/test-product` |
+| Save QR code to file    | `curl http://localhost:3000/api/qr/save/test-product` |
 
 ***
 
@@ -162,8 +139,15 @@ API server listening on port 3000
 - [Hyperledger Fabric Docs](https://hyperledger-fabric.readthedocs.io/)
 - [VS Code Remote - WSL](https://code.visualstudio.com/docs/remote/wsl)
 - [Docker Desktop for Windows](https://docs.docker.com/desktop/windows/wsl/)
-- [QR Code Library (qrcode)](https://github.com/soldair/node-qrcode)
+- [QR Code Node.js Library](https://github.com/soldair/node-qrcode)
 
 ***
 
-Feel free to reach out if you want specific guidance on any step or feature!
+## Next Steps
+
+- Integrate frontend UI with backend APIs.
+- Replace dummy URLs with real app URLs.
+- Add blockchain transaction interactions.
+- Implement authentication and secure token workflows.
+
+***
