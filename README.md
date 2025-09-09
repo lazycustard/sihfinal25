@@ -1,56 +1,50 @@
-<!-- Dont forget to update README before making any new changes or introducing any new dependencies -->
+# 🌱 FarmTrace - Blockchain Product Traceability System
 
-# SIH25 – QR generation logic
-This backend generates **unique QR codes** for products.  
-It uses [uv](https://docs.astral.sh/uv/) (a fast Python package manager) and [qrcode](https://pypi.org/project/qrcode/).  
-[Flask](https://flask.palletsprojects.com/) is also installed for future API development but is **not currently used**.
+Complete blockchain-based product traceability system with React frontend and Node.js backend.
+
+## 🚀 **QUICK START - 3 STEPS**
+
+### **Step 1: Install Requirements**
+Choose ONE option:
+- **Docker Desktop**: [Download here](https://www.docker.com/products/docker-desktop/) (Recommended)
+- **Node.js**: [Download here](https://nodejs.org/) (LTS version)
+
+### **Step 2: Run the System**
+**Windows**: Double-click `start.bat`
+**Any OS**: Run `docker compose up --build`
+
+### **Step 3: Access & Test**
+- **Open**: http://localhost:3000
+- **Login**: farmer1 / demo123
+- **Create**: Product → Generate QR
+- **Verify**: Login as consumer1/demo123 → Trace product
+
+## 🔑 **Demo Credentials**
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | admin | admin123 |
+| Farmer | farmer1 | demo123 |
+| Distributor | distributor1 | demo123 |
+| Retailer | retailer1 | demo123 |
+| Consumer | consumer1 | demo123 |
+
+## 🛠️ **Technology Stack**
+- **Frontend**: React 19, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express.js, JWT Authentication
+- **Blockchain**: Mock Hyperledger Fabric integration
+- **QR Codes**: Generation, saving, and verification
+- **Containerization**: Docker & Docker Compose
+
+## 🎯 **Complete Workflow**
+1. **Farmer**: Register → Create Product → Generate QR Code
+2. **Distributor**: Transfer ownership → Update location
+3. **Retailer**: Receive product → Update inventory
+4. **Consumer**: Scan QR → View complete journey
+
+## 🆘 **Troubleshooting**
+- **Port 3000 in use**: Run `npx kill-port 3000`
+- **Docker issues**: Run `docker system prune -a`
+- **Node.js not found**: Install from nodejs.org and restart computer
 
 ---
-
-## 🚀 Prerequisites
-- Python **3.12.3**
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) (fast Python package manager)
-- Git
-
----
-
-## ⚡ Installation
-
-### 1. Clone the repo
-```bash
-git clone https://github.com/anshulbadhani/sih25.git
-cd sih25/backend
-```
-
-### 2. Install (uv if not installed already)
-- Follow instruction as mentioned at [Installation | uv](https://docs.astral.sh/uv/getting-started/installation/)
-- Verify using
-    ```bash
-    uv --version
-    ```
-
-### 3. Sync Dependecies
-```bash
-uv sync
-```
-
-### 4. Run the script
-```bash
-uv run python main.py
-```
-
---- 
-
-## Team workflow / How to contribute
-Just remember to use ```git pull``` command before modifying the repository
-
-## Proposed Folder Sturcture
-This is how I imagine to inlcude this repo in the existing codebase (maybe it would be better to make a new organisation and write code there)
-```bash
-<Root Directory>
-|–– Frontend/
-|–– Backend/
-    |–– QR_Logic/ (this repository)
-        |–– ...
-    |–– Other Stuff/
-|–– Misc
+**🎉 Ready to run on any laptop!**
