@@ -33,6 +33,42 @@ function Farmer() {
     monthlyEarnings: 45000
   };
 
+  // Mock recent batches data
+  const recentBatches = products.length > 0 ? products.slice(0, 5).map((product, index) => ({
+    id: product.productId || `BATCH-${index + 1}`,
+    product: product.productType || "Sample Product",
+    variety: product.variety || "Standard",
+    weight: product.batchSize || "25 kg",
+    status: product.status || "Ready for Pickup",
+    createdDate: new Date(product.createdAt || Date.now()).toLocaleDateString(),
+    buyer: "Agro Supply Co.",
+    price: product.basePrice || 45,
+    qrGenerated: true
+  })) : [
+    {
+      id: "BATCH-001",
+      product: "Organic Tomatoes",
+      variety: "Roma",
+      weight: "50 kg",
+      status: "Ready for Pickup",
+      createdDate: "2024-01-15",
+      buyer: "Agro Supply Co.",
+      price: 45,
+      qrGenerated: true
+    },
+    {
+      id: "BATCH-002", 
+      product: "Fresh Carrots",
+      variety: "Nantes",
+      weight: "30 kg",
+      status: "In Transit",
+      createdDate: "2024-01-14",
+      buyer: "Fresh Mart",
+      price: 35,
+      qrGenerated: true
+    }
+  ];
+
   useEffect(() => {
     loadProducts();
   }, []);

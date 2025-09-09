@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "generate-qr": "node scripts/generate-qr-codes.js",
-    "build:frontend": "cd config && vite build",
+    "build:frontend": "echo 'Frontend build handled by Docker'",
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down --volumes",
     "up": "npm run docker:up",

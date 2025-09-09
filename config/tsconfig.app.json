@@ -11,6 +11,7 @@
 		"moduleDetection": "auto",
 		"noEmit": true,
 		"jsx": "react-jsx",
+		"jsxImportSource": "react",
 		"strict": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
@@ -18,7 +19,8 @@
 		"baseUrl": "..",
 		"paths": {
 			"*": ["node_modules/*", "../node_modules/*"]
-		}
+		},
+		"types": ["vite/client", "react", "react-dom"]
 	},
 	"include": ["../frontend/src", "../frontend/src/vite-env.d.ts"]
 }

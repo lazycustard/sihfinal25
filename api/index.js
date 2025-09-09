@@ -206,7 +206,14 @@ app.get('/api/qr-verify/:productId', async (req, res) => {
 
 // Removed legacy HTML route; React app handles UI
 
-// Removed /health
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
 // Removed /api/performance
 

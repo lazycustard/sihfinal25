@@ -20,9 +20,12 @@ COPY . .
 RUN mkdir -p qrcodes
 
 # Build frontend from Vite project (frontend/) and publish to public
-RUN npm run build:frontend && \
-  rm -rf ./public && mkdir -p ./public && cp -r ./dist/* ./public/ && \
-  rm -rf ./dist
+WORKDIR /app/frontend
+RUN npm install
+RUN npm run build
+WORKDIR /app
+RUN rm -rf ./public && mkdir -p ./public
+RUN if [ -d "./dist" ]; then cp -r ./dist/* ./public/ && rm -rf ./dist; fi
 
 # Expose port
 EXPOSE 3000

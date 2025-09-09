@@ -15,7 +15,20 @@ if %errorlevel% == 0 (
     echo [2/3] Building and starting system...
     echo This may take 5-10 minutes on first run...
     echo.
-    docker compose up --build
+    docker compose up --build -d
+    echo.
+    echo [3/3] Checking container status...
+    timeout /t 5 /nobreak >nul
+    docker ps
+    echo.
+    echo Testing application...
+    timeout /t 2 /nobreak >nul
+    curl -s http://localhost:3000/health >nul 2>&1
+    if %errorlevel% == 0 (
+        echo ✓ Application is running successfully!
+    ) else (
+        echo ⚠ Application may still be starting up...
+    )
     goto :success
 )
 

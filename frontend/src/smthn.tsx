@@ -17,7 +17,7 @@ function ParallaxFarmBackground() {
         <circle cx="220" cy="120" r="40" fill="#FFD60A" opacity="0.7" />
 
         {/* Hills */}
-        <path d="M0 400 Q 360 300 720 400 T 1440 400 V600 H0Z" fill="#A7C957" />
+        <path d="M0 nothing is visible scan thriugh while codebase anjd  400 Q 360 300 720 400 T 1440 400 V600 H0Z" fill="#A7C957" />
         <path d="M0 500 Q 480 450 960 500 T 1440 500 V600 H0Z" fill="#6A994E" />
 
         {/* Barn */}
