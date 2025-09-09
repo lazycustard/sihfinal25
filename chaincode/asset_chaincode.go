@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hyperledger/fabric-chaincode-go/pkg/statebased" // SBE helper
-	//"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
@@ -14,20 +12,44 @@ type SmartContract struct {
 	contractapi.Contract
 }
 
-type Asset struct {
-	ID            string   `json:"id"`
-	Owner         string   `json:"owner"`
-	Status        string   `json:"status"` // "OPEN" | "CLOSED"
-	MetadataHash  string   `json:"metadataHash,omitempty"`
-	Events        []string `json:"events,omitempty"`
-	ClosedAt      string   `json:"closedAt,omitempty"`
-	LastScanHash  string   `json:"lastScanHash,omitempty"` // pseudonymous receipt hash
+type Product struct {
+	ProductID     string        `json:"productId"`
+	ProductType   string        `json:"productType"`
+	BatchSize     string        `json:"batchSize"`
+	HarvestDate   string        `json:"harvestDate"`
+	Status        string        `json:"status"` // "ACTIVE" | "COMPLETED"
+	Transactions  []Transaction `json:"transactions"`
+	CreatedAt     string        `json:"createdAt"`
+	UpdatedAt     string        `json:"updatedAt"`
+}
+
+type Transaction struct {
+	Role        string `json:"role"`        // "Farmer", "Distributor", "Retailer"
+	Name        string `json:"name"`        // Entity name
+	Location    string `json:"location"`    // Entity location
+	Timestamp   string `json:"timestamp"`   // Transaction timestamp
+	HandlingInfo string `json:"handlingInfo,omitempty"` // Optional handling details
+	TransactionID string `json:"transactionId"` // Unique transaction ID
+}
+
+type FarmerDetails struct {
+	Name        string `json:"name"`
+	Location    string `json:"location"`
+	ContactInfo string `json:"contactInfo,omitempty"`
+}
+
+type ProductDetails struct {
+	ProductType string `json:"productType"`
+	BatchSize   string `json:"batchSize"`
+	HarvestDate string `json:"harvestDate"`
+	Quality     string `json:"quality,omitempty"`
+	Organic     bool   `json:"organic,omitempty"`
 }
 
 // ---------- utils ----------
 
-func (s *SmartContract) assetExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
-	b, err := ctx.GetStub().GetState(id)
+func (s *SmartContract) productExists(ctx contractapi.TransactionContextInterface, productId string) (bool, error) {
+	b, err := ctx.GetStub().GetState(productId)
 	if err != nil {
 		return false, err
 	}
@@ -39,117 +61,199 @@ func getClientMSP(ctx contractapi.TransactionContextInterface) (string, error) {
 	return id.GetMSPID()
 }
 
-// ---------- CRUD ----------
+func generateTransactionID() string {
+	return fmt.Sprintf("TXN-%d", time.Now().UnixNano())
+}
 
-func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id, owner, metadataHash string) error {
-	exists, err := s.assetExists(ctx, id)
+// ---------- Product Registration ----------
+
+func (s *SmartContract) RegisterProduct(ctx contractapi.TransactionContextInterface, productId string, farmerDetailsJSON string, productDetailsJSON string) error {
+	exists, err := s.productExists(ctx, productId)
 	if err != nil {
 		return err
 	}
 	if exists {
-		return fmt.Errorf("asset %s already exists", id)
+		return fmt.Errorf("product %s already exists", productId)
 	}
-	a := Asset{
-		ID:           id,
-		Owner:        owner,
-		Status:       "OPEN",
-		MetadataHash: metadataHash,
-		Events:       []string{"CREATED"},
+
+	var farmerDetails FarmerDetails
+	if err := json.Unmarshal([]byte(farmerDetailsJSON), &farmerDetails); err != nil {
+		return fmt.Errorf("invalid farmer details JSON: %v", err)
 	}
-	b, _ := json.Marshal(a)
-	return ctx.GetStub().PutState(id, b)
+
+	var productDetails ProductDetails
+	if err := json.Unmarshal([]byte(productDetailsJSON), &productDetails); err != nil {
+		return fmt.Errorf("invalid product details JSON: %v", err)
+	}
+
+	now := time.Now().UTC().Format(time.RFC3339)
+	
+	// Create initial transaction for farmer registration
+	initialTransaction := Transaction{
+		Role:          "Farmer",
+		Name:          farmerDetails.Name,
+		Location:      farmerDetails.Location,
+		Timestamp:     now,
+		HandlingInfo:  fmt.Sprintf("Product registered - %s", productDetails.ProductType),
+		TransactionID: generateTransactionID(),
+	}
+
+	product := Product{
+		ProductID:    productId,
+		ProductType:  productDetails.ProductType,
+		BatchSize:    productDetails.BatchSize,
+		HarvestDate:  productDetails.HarvestDate,
+		Status:       "ACTIVE",
+		Transactions: []Transaction{initialTransaction},
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}
+
+	productJSON, err := json.Marshal(product)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutState(productId, productJSON)
 }
 
-func (s *SmartContract) UpdateAsset(ctx contractapi.TransactionContextInterface, id, eventJSON string) error {
-	b, err := ctx.GetStub().GetState(id)
+// ---------- Ownership Transfer ----------
+
+func (s *SmartContract) TransferOwnership(ctx contractapi.TransactionContextInterface, productId string, newOwnerRole string, newOwnerName string, newOwnerLocation string, handlingInfo string) error {
+	productJSON, err := ctx.GetStub().GetState(productId)
 	if err != nil {
 		return err
 	}
-	if b == nil {
-		return fmt.Errorf("asset %s not found", id)
+	if productJSON == nil {
+		return fmt.Errorf("product %s not found", productId)
 	}
-	var a Asset
-	if err := json.Unmarshal(b, &a); err != nil {
+
+	var product Product
+	if err := json.Unmarshal(productJSON, &product); err != nil {
 		return err
 	}
-	if a.Status == "CLOSED" {
-		return fmt.Errorf("asset %s is CLOSED; no further updates allowed", id)
+
+	if product.Status == "COMPLETED" {
+		return fmt.Errorf("product %s is already completed; no further transfers allowed", productId)
 	}
-	a.Events = append(a.Events, eventJSON)
-	nb, _ := json.Marshal(a)
-	return ctx.GetStub().PutState(id, nb)
+
+	now := time.Now().UTC().Format(time.RFC3339)
+	
+	newTransaction := Transaction{
+		Role:          newOwnerRole,
+		Name:          newOwnerName,
+		Location:      newOwnerLocation,
+		Timestamp:     now,
+		HandlingInfo:  handlingInfo,
+		TransactionID: generateTransactionID(),
+	}
+
+	product.Transactions = append(product.Transactions, newTransaction)
+	product.UpdatedAt = now
+
+	updatedProductJSON, err := json.Marshal(product)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutState(productId, updatedProductJSON)
 }
 
-func (s *SmartContract) AppendEvent(ctx contractapi.TransactionContextInterface, id, eventJSON string) error {
-	return s.UpdateAsset(ctx, id, eventJSON)
-}
+// ---------- Complete Product Journey ----------
 
-// ---------- Finalize (terminal state + SBE) ----------
-
-func (s *SmartContract) FinalizeAsset(ctx contractapi.TransactionContextInterface, id, consumerReceiptHash string) error {
-	b, err := ctx.GetStub().GetState(id)
+func (s *SmartContract) CompleteProduct(ctx contractapi.TransactionContextInterface, productId string, consumerInfo string) error {
+	productJSON, err := ctx.GetStub().GetState(productId)
 	if err != nil {
 		return err
 	}
-	if b == nil {
-		return fmt.Errorf("asset %s not found", id)
-	}
-	var a Asset
-	if err := json.Unmarshal(b, &a); err != nil {
-		return err
-	}
-	if a.Status == "CLOSED" {
-		return fmt.Errorf("asset %s already CLOSED", id)
+	if productJSON == nil {
+		return fmt.Errorf("product %s not found", productId)
 	}
 
-	a.Status = "CLOSED"
-	a.LastScanHash = consumerReceiptHash
-	a.ClosedAt = time.Now().UTC().Format(time.RFC3339)
-	a.Events = append(a.Events, "FINALIZED")
-
-	nb, _ := json.Marshal(a)
-	if err := ctx.GetStub().PutState(id, nb); err != nil {
+	var product Product
+	if err := json.Unmarshal(productJSON, &product); err != nil {
 		return err
 	}
 
-	evtPayload, _ := json.Marshal(map[string]string{"assetId": id, "status": a.Status})
-	if err := ctx.GetStub().SetEvent("AssetFinalized", evtPayload); err != nil {
-		return err
+	if product.Status == "COMPLETED" {
+		return fmt.Errorf("product %s is already completed", productId)
 	}
 
-	ep, err := statebased.NewStateEP(nil)
+	now := time.Now().UTC().Format(time.RFC3339)
+	
+	finalTransaction := Transaction{
+		Role:          "Consumer",
+		Name:          "End Consumer",
+		Location:      "Point of Sale",
+		Timestamp:     now,
+		HandlingInfo:  fmt.Sprintf("Product verified by consumer: %s", consumerInfo),
+		TransactionID: generateTransactionID(),
+	}
+
+	product.Transactions = append(product.Transactions, finalTransaction)
+	product.Status = "COMPLETED"
+	product.UpdatedAt = now
+
+	updatedProductJSON, err := json.Marshal(product)
 	if err != nil {
 		return err
 	}
-	if err := ep.AddOrgs(statebased.RoleTypePeer, "Org1MSP", "Org2MSP"); err != nil {
+
+	if err := ctx.GetStub().PutState(productId, updatedProductJSON); err != nil {
 		return err
 	}
-	policy, err := ep.Policy()
-	if err != nil {
-		return err
-	}
-	if err := ctx.GetStub().SetStateValidationParameter(id, policy); err != nil {
+
+	// Emit event for product completion
+	eventPayload, _ := json.Marshal(map[string]string{"productId": productId, "status": product.Status})
+	if err := ctx.GetStub().SetEvent("ProductCompleted", eventPayload); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// ---------- read helpers ----------
+// ---------- Query Functions ----------
 
-func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, id string) (*Asset, error) {
-	b, err := ctx.GetStub().GetState(id)
+func (s *SmartContract) GetProductHistory(ctx contractapi.TransactionContextInterface, productId string) (*Product, error) {
+	productJSON, err := ctx.GetStub().GetState(productId)
 	if err != nil {
 		return nil, err
 	}
-	if b == nil {
-		return nil, fmt.Errorf("asset %s not found", id)
+	if productJSON == nil {
+		return nil, fmt.Errorf("product %s not found", productId)
 	}
-	var a Asset
-	if err := json.Unmarshal(b, &a); err != nil {
+
+	var product Product
+	if err := json.Unmarshal(productJSON, &product); err != nil {
 		return nil, err
 	}
-	return &a, nil
+
+	return &product, nil
+}
+
+func (s *SmartContract) GetAllProducts(ctx contractapi.TransactionContextInterface) ([]*Product, error) {
+	resultsIterator, err := ctx.GetStub().GetStateByRange("", "")
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+
+	var products []*Product
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		var product Product
+		if err := json.Unmarshal(queryResponse.Value, &product); err != nil {
+			continue // Skip invalid records
+		}
+
+		products = append(products, &product)
+	}
+
+	return products, nil
 }
 
 func main() {

@@ -1,0 +1,26 @@
+{
+  "recommendations": [
+    "ms-vscode.vscode-node-azure-pack",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-eslint",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "ms-azuretools.vscode-docker",
+    "golang.go",
+    "IBM.blockchain-platform-extension",
+    "ms-vscode.js-debug-nightly",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "ritwickdey.liveserver",
+    "ms-vscode.hexeditor",
+    "streetsidesoftware.code-spell-checker",
+    "gruntfuggly.todo-tree",
+    "aaron-bond.better-comments",
+    "PKief.material-icon-theme",
+    "zhuangtongfa.material-theme",
+    "ms-vscode.theme-tomorrowkit"
+  ]
+}

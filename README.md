@@ -1,150 +1,291 @@
-# Project README
+.
+# 🌱 FarmTrace - Blockchain Product Traceability System
 
-## Overview
+A comprehensive blockchain-based product traceability system for agricultural supply chains, ensuring transparency from farm to consumer.
 
-This project is a Node.js backend providing QR code generation linked to product details pages, integrating with Hyperledger Fabric blockchain for product tracking and finalization.
+## ✨ Features
 
-***
+### 🌾 **Farmer Dashboard**
+- Register new products with detailed information
+- Generate QR codes for product tracking
+- Track product batches and earnings
+- Manage farm inventory and certifications
 
-## 1. Setup: Docker + WSL + VS Code Remote Explorer
+### 🚚 **Distributor/Retailer Management**
+- Receive products from farmers
+- Transfer ownership in the supply chain
+- Update product locations and handling info
+- Manage distribution network
 
-### Prerequisites
+### 👥 **Consumer Experience**
+- Scan QR codes to verify product authenticity
+- View complete product journey from farm to table
+- Check freshness scores and certifications
+- Access farmer information and contact details
 
-- Windows 10/11 with **WSL 2** enabled.
-- Docker Desktop configured to use WSL 2 backend.
-- VS Code with **Remote - WSL** and **Remote - Containers** extensions.
-- Node.js v16 LTS or newer installed inside WSL/Docker container.
+### ⚙️ **Admin Panel**
+- System overview and analytics dashboard
+- User management and role assignment
+- System configuration and monitoring
+- Performance metrics and reporting
 
-### Instructions
+## 🚀 Quick Start
 
-- Open VS Code in WSL mode (`Remote-WSL: New Window`).
-- Open your project folder inside this environment.
-- (Optional) Use Docker container development via VS Code Remote Explorer.
-
-***
-
-## 2. Clone and prepare the project
+### **Option 1: Docker (Recommended)**
 
 ```bash
-git clone <repo-url>
-cd <project-folder>
+# Clone the repository
+git clone <repository-url>
+cd sih25
+
+# Run with Docker
+.\start.bat  # Windows
+# OR
+docker compose up --build  # Linux/Mac
+
+# Access the application
+# Open browser to http://localhost:3000
+```
+
+### **Option 2: Manual Setup**
+
+```bash
+# Install dependencies
 npm install
-```
+cd frontend && npm install && cd ..
 
-- Installs all dependencies.
-- Use `npm install --force` only if absolutely necessary.
+# Build frontend
+npm run build:frontend
 
-***
-
-## 3. Environment Configuration
-
-Create `.env` in the root with variables:
-
-```env
-PORT=3000
-CONNECTION_PROFILE=path/to/connection-profile.json
-WALLET_PATH=path/to/wallet
-CLIENT_IDENTITY=yourIdentity
-CHANNEL_NAME=yourchannel
-CHAINCODE_NAME=yourchaincode
-QR_JWT_PRIVKEY="your RSA private key PEM string"
-QR_JWT_PUBKEY="your RSA public key PEM string"
-```
-
-Adjust values accordingly.
-
-***
-
-## 4. Running the server
-
-```bash
+# Start the server
 npm start
 ```
 
-You will see:
+## 🔑 Demo Credentials
+
+| Role | Username | Password | Description |
+|------|----------|----------|-------------|
+| **Admin** | admin | admin123 | System administration |
+| **Farmer** | farmer1 | demo123 | Product registration |
+| **Distributor** | distributor1 | demo123 | Supply chain management |
+| **Retailer** | retailer1 | demo123 | Retail operations |
+| **Consumer** | consumer1 | demo123 | Product verification |
+
+## 🏗️ Technology Stack
+
+### **Frontend**
+- **React 19** with TypeScript
+- **Tailwind CSS** for styling
+- **Framer Motion** for animations
+- **React Router** for navigation
+- **Vite** for build tooling
+
+### **Backend**
+- **Node.js** with Express.js
+- **JWT** authentication
+- **Bcrypt** password hashing
+- **Winston** logging
+- **CORS** and security headers
+
+### **Blockchain Integration**
+- **Mock Blockchain Service** (development)
+- **Product Registration** and tracking
+- **Ownership Transfer** management
+- **Transaction History** recording
+- **Chain Finalization** on consumer scan
+
+### **Deployment**
+- **Docker** containerization
+- **Docker Compose** orchestration
+- **Health checks** and monitoring
+- **Environment configuration**
+
+## 📡 API Endpoints
+
+### **Authentication**
+```
+POST /api/auth/login          - User login
+POST /api/auth/register       - User registration
+GET  /api/auth/profile        - Get user profile
+GET  /api/auth/demo-credentials - Demo credentials
+```
+
+### **Product Management**
+```
+POST /api/products/register   - Register new product
+POST /api/products/:id/transfer - Transfer ownership
+GET  /api/products/:id/history - Get product history
+GET  /api/products            - Get all products
+POST /api/products/:id/complete - Complete product journey
+POST /api/products/:id/finalize - Finalize blockchain
+```
+
+### **QR Code Management**
+```
+GET  /api/qr/data/:id         - Generate QR code data
+POST /api/qr/save/:id         - Save QR code image
+GET  /api/qr-verify/:id       - Verify product (public)
+```
+
+### **System**
+```
+GET  /api/status              - System status
+GET  /api/analytics/dashboard - Analytics data
+GET  /health                  - Health check
+```
+
+## 🏛️ Architecture
 
 ```
-API server listening on port 3000
+┌─────────────────────────────────────────────────────────────┐
+│                    Frontend (React + TypeScript)            │
+├─────────────────────────────────────────────────────────────┤
+│  Pages: Farmer, Consumer, Admin, Distributor, Retailer     │
+│  Components: QRScanner, RoleCard, Layout                   │
+│  Services: API integration, Authentication                 │
+│  Contexts: AuthContext for state management                │
+└─────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Backend (Node.js + Express)             │
+├─────────────────────────────────────────────────────────────┤
+│  API Routes: Authentication, Products, QR, Analytics       │
+│  Services: Blockchain, Encryption, SMS, External APIs      │
+│  Middleware: Auth, Security, CORS, Validation              │
+│  Utils: Logging, Encryption, Error handling                │
+└─────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────┐
+│                Blockchain Service (Mock)                    │
+├─────────────────────────────────────────────────────────────┤
+│  Product Registration & Tracking                           │
+│  Ownership Transfer Management                              │
+│  Transaction History Recording                              │
+│  Chain Finalization on Consumer Scan                       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-***
+## 🔒 Security Features
 
-## 5. Testing and Usage
+- **JWT-based Authentication** with role-based access control
+- **Data Encryption** for sensitive information
+- **Security Headers** (CORS, XSS protection, etc.)
+- **Input Validation** and sanitization
+- **Password Hashing** with bcrypt
+- **Rate Limiting** and request validation
 
-- Visit `http://localhost:3000/` for the QR code generation page.
-- Click **Generate QR Code** to get the QR image.
-- Scan QR with your phone; it opens the configured product details link.
-- Visit `http://localhost:3000/api/product-details.html` to view dummy product info.
+## 🚀 Deployment
 
-***
+### **Production with Docker**
 
-## 6. Accessing from mobile on same network
+```bash
+# Build production image
+docker build -t farmtrace:latest .
 
-- Find your PC's local IP (e.g., `192.168.1.100`).
-- Replace `localhost` in URLs with your IP so phone can access server.
-- Ensure firewall allows port 3000 inbound.
-- Connect phone and PC to same Wi-Fi.
+# Run with environment variables
+docker run -d \
+  --name farmtrace \
+  -p 3000:3000 \
+  -e NODE_ENV=production \
+  -e JWT_SECRET=your-production-secret \
+  -e ENCRYPTION_KEY=your-32-char-key \
+  farmtrace:latest
+```
 
-***
+### **Production with Docker Compose**
 
-## 7. Notes & Common Issues
+```bash
+# Copy environment file
+cp env.example .env
 
-### npm dependency errors
+# Edit environment variables
+# Then run:
+docker compose -f docker-compose.prod.yml up -d
+```
 
-- Early errors with `ETARGET` and package versions (`@hyperledger/fabric-gateway`) were due to unpublished or unavailable versions on public npm.
-- Resolution: Use stable `fabric-network@2.2.20`.
-- Avoid `npm audit fix --force` as it can downgrade packages causing breaking changes.
-- Use `npm cache clean --force` cautiously to fix corrupt caches.
+### **Environment Variables**
 
-### Syntax errors in `qr.js`
+```bash
+NODE_ENV=production
+PORT=3000
+JWT_SECRET=your-super-secret-jwt-key
+ENCRYPTION_KEY=your-32-character-encryption-key
+```
 
-- Regex for stripping base64 prefix needed correction:  
-  Incorrect: `^data:image\\/png;base64,`  
-  Correct: `^data:image\/png;base64,`
+## 📊 Monitoring & Health Checks
 
-### Server & Networking Tips
+- **Health Check**: `GET /health`
+- **System Status**: `GET /api/status`
+- **Application Logs**: Winston logging system
+- **Performance Metrics**: Built-in monitoring
+- **Docker Health Checks**: Automatic container monitoring
 
-- “Cannot GET /” occurs if no root route is defined.
-- Add root route serving friendly HTML to avoid this.
-- Localhost URLs are not accessible from phone directly.
-- Always replace `localhost` with PC's LAN IP for mobile testing.
-- Consider tools like `ngrok` for public tunnels.
+## 🧪 Testing the System
 
-### Debugging
+1. **Start the application** using `.\start.bat` or Docker
+2. **Open browser** to `http://localhost:3000`
+3. **Login as farmer1/demo123** to register products
+4. **Login as distributor1/demo123** to transfer ownership
+5. **Login as consumer1/demo123** to verify products
+6. **Use QR codes** to trace product journey
 
-- Use `curl` commands to verify API response headers and content.
-- Run server continuously in one terminal and use another to call APIs.
-- Check firewall and Docker port mappings carefully.
+## 📁 Project Structure
 
-***
+```
+sih25/
+├── frontend/                 # React frontend
+│   ├── src/
+│   │   ├── pages/           # Page components
+│   │   ├── components/      # Reusable components
+│   │   ├── contexts/        # React contexts
+│   │   └── services/        # API services
+│   ├── package.json
+│   └── vite.config.ts
+├── api/                     # Backend API
+│   ├── auth.js             # Authentication routes
+│   ├── blockchain.js       # Blockchain service
+│   ├── qr.js              # QR code management
+│   └── index.js           # Main server file
+├── config/                 # Configuration files
+├── utils/                  # Utility functions
+├── docker-compose.yml      # Docker configuration
+├── Dockerfile             # Docker build file
+├── start.bat             # Windows startup script
+└── DEPLOYMENT.md         # Deployment guide
+```
 
-## Useful commands
+## 🤝 Contributing
 
-| Task                    | Command                          |
-|-------------------------|---------------------------------|
-| Install dependencies    | `npm install`                   |
-| Clear npm cache         | `npm cache clean --force`       |
-| Start server            | `npm start`                    |
-| Test QR code generation | `curl http://localhost:3000/api/qr/test-product` |
-| Save QR code to file    | `curl http://localhost:3000/api/qr/save/test-product` |
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-***
+## 📄 License
 
-## References & Links
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- [Hyperledger Fabric Docs](https://hyperledger-fabric.readthedocs.io/)
-- [VS Code Remote - WSL](https://code.visualstudio.com/docs/remote/wsl)
-- [Docker Desktop for Windows](https://docs.docker.com/desktop/windows/wsl/)
-- [QR Code Node.js Library](https://github.com/soldair/node-qrcode)
+## 🆘 Support
 
-***
+- **Documentation**: Check `DEPLOYMENT.md` for detailed setup
+- **Issues**: Open an issue on GitHub
+- **Demo**: Use the provided demo credentials to test all features
 
-## Next Steps
+## 🎯 Roadmap
 
-- Integrate frontend UI with backend APIs.
-- Replace dummy URLs with real app URLs.
-- Add blockchain transaction interactions.
-- Implement authentication and secure token workflows.
+- [ ] Real blockchain integration (Hyperledger Fabric)
+- [ ] Database persistence (PostgreSQL)
+- [ ] Mobile app (React Native)
+- [ ] IoT sensor integration
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language support
+- [ ] SMS/Email notifications
+- [ ] API rate limiting
+- [ ] Caching layer (Redis)
 
-***
+---
 
+**Built with ❤️ for Smart India Hackathon 2025**
