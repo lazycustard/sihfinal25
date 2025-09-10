@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import apiService from "../services/api";
 import QRScanner from "../QRScanner";
+import { useI18n } from "../i18n/I18nContext";
 
 function Consumer() {
+  const { t } = useI18n();
   const [searchId, setSearchId] = useState("");
   const [activeTab, setActiveTab] = useState("recent");
   const [isLoading, setIsLoading] = useState(false);
@@ -128,21 +130,21 @@ function Consumer() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen textured-bg farm-bg font-body">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="wooden-signboard shadow-lg border-b-2 border-dark-brown">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">🌱</span>
+              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <span className="text-white font-bold text-lg swaying-leaf hand-drawn-icon">🌱</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">FarmTrace</span>
+              <span className="text-xl font-bold text-white drop-shadow-sm font-heading">{t('app_name')}</span>
             </Link>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Welcome back!</span>
-              <button className="text-green-600 hover:text-green-700">
-                Profile
+              <span className="text-violet-100">{t('consumer_welcome')}</span>
+              <button className="text-white hover:text-violet-200 bg-white bg-opacity-10 px-3 py-1 rounded-lg backdrop-blur-sm transition-colors">
+                {t('profile')}
               </button>
             </div>
           </div>
@@ -154,13 +156,13 @@ function Consumer() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-sm p-6 mb-8"
+          className="rustic-card p-6 mb-8"
         >
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Trace Your Food</h1>
+          <h1 className="text-2xl font-bold text-deep-green mb-4 drop-shadow-sm font-heading">{t('consumer_trace_food')}</h1>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
-              placeholder="Enter product ID or scan QR code"
+              placeholder={t('consumer_enter_id_placeholder')}
               value={searchId}
               onChange={(e) => setSearchId(e.target.value)}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -170,15 +172,15 @@ function Consumer() {
               <button
                 onClick={handleTrace}
                 disabled={isLoading}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 rustic-btn font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed font-body"
               >
-                {isLoading ? "Tracing..." : "Trace"}
+                {isLoading ? t('tracing') : t('trace')}
               </button>
               <button 
                 onClick={() => setShowQRScanner(true)}
-                className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-3 rustic-btn-secondary rounded-lg transition-all font-body"
               >
-                📱 Scan QR
+                <span className="hand-drawn-icon">📱</span> {t('scan_qr')}
               </button>
             </div>
           </div>
@@ -206,7 +208,7 @@ function Consumer() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Recent Traces
+              {t('consumer_recent_traces')}
             </button>
             <button
               onClick={() => setActiveTab("favorites")}
@@ -216,7 +218,7 @@ function Consumer() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Favorite Farms
+              {t('consumer_favorite_farms')}
             </button>
             <button
               onClick={() => setActiveTab("alerts")}
@@ -226,7 +228,7 @@ function Consumer() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Alerts
+              {t('consumer_alerts')}
             </button>
           </div>
         </motion.div>
@@ -240,7 +242,9 @@ function Consumer() {
             className="space-y-4"
           >
             {recentTraces.map((trace) => (
-              <div key={trace.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div key={trace.id} className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-white border-opacity-20" style={{
+                backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)'
+              }}>
                 <div className="flex flex-col md:flex-row gap-6">
                   <img
                     src={trace.image}
@@ -296,7 +300,9 @@ function Consumer() {
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             {favorites.map((farm) => (
-              <div key={farm.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div key={farm.id} className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-white border-opacity-20" style={{
+                backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)'
+              }}>
                 <div className="flex items-start gap-4 mb-4">
                   <img
                     src={farm.image}
@@ -349,7 +355,9 @@ function Consumer() {
             className="space-y-4"
           >
             {alerts.map((alert) => (
-              <div key={alert.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div key={alert.id} className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-white border-opacity-20" style={{
+                backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)'
+              }}>
                 <div className="flex items-start gap-4">
                   <div className="text-2xl">{alert.icon}</div>
                   <div className="flex-1">
@@ -370,11 +378,14 @@ function Consumer() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 bg-green-50 rounded-2xl p-6"
+          className="mt-8 bg-gradient-to-br from-green-100 to-emerald-100 bg-opacity-80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white border-opacity-30"
+          style={{
+            backgroundImage: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)'
+          }}
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-4 drop-shadow-sm">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="flex items-center gap-3 p-4 bg-white rounded-xl hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-3 p-4 bg-white bg-opacity-90 backdrop-blur-sm rounded-xl hover:bg-opacity-100 transition-all shadow-sm border border-white border-opacity-50">
               <span className="text-2xl">📱</span>
               <div className="text-left">
                 <div className="font-medium text-gray-900">Scan QR Code</div>
@@ -382,7 +393,7 @@ function Consumer() {
               </div>
             </button>
             
-            <button className="flex items-center gap-3 p-4 bg-white rounded-xl hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-3 p-4 bg-white bg-opacity-90 backdrop-blur-sm rounded-xl hover:bg-opacity-100 transition-all shadow-sm border border-white border-opacity-50">
               <span className="text-2xl">🔔</span>
               <div className="text-left">
                 <div className="font-medium text-gray-900">Set Price Alerts</div>
@@ -390,7 +401,7 @@ function Consumer() {
               </div>
             </button>
             
-            <button className="flex items-center gap-3 p-4 bg-white rounded-xl hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-3 p-4 bg-white bg-opacity-90 backdrop-blur-sm rounded-xl hover:bg-opacity-100 transition-all shadow-sm border border-white border-opacity-50">
               <span className="text-2xl">📊</span>
               <div className="text-left">
                 <div className="font-medium text-gray-900">Compare Prices</div>

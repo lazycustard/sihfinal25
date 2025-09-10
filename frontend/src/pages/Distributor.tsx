@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useI18n } from "../i18n/I18nContext";
+import QRGenerator from "../components/QRGenerator";
 
 function Distributor() {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState("active");
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<any>(null);
   const [scanId, setScanId] = useState("");
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedProductForQR, setSelectedProductForQR] = useState<any>(null);
 
   // Mock data for distributor dashboard
   const distributorData = {
@@ -146,6 +151,11 @@ function Distributor() {
     setShowAcceptModal(true);
   };
 
+  const handleGenerateQR = (batch: any) => {
+    setSelectedProductForQR(batch);
+    setShowQRModal(true);
+  };
+
   const handleUpdateStatus = (batch: any) => {
     setSelectedBatch(batch);
     setShowUpdateModal(true);
@@ -160,7 +170,13 @@ function Distributor() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-amber-50 to-orange-50" style={{
+      backgroundImage: `
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 183, 77, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(34, 197, 94, 0.1) 0%, transparent 50%)
+      `
+    }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-4">
@@ -169,10 +185,10 @@ function Distributor() {
               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">🌱</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">FarmTrace</span>
+              <span className="text-xl font-bold text-gray-900">{t('app_name')}</span>
             </Link>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Welcome, {distributorData.name}</span>
+              <span className="text-gray-600">{t('distributor_welcome')}, {distributorData.name}</span>
               <button className="text-green-600 hover:text-green-700">
                 Profile
               </button>
@@ -190,14 +206,14 @@ function Distributor() {
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Transport Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('distributor_dashboard')}</h1>
               <p className="text-gray-600">{distributorData.location} • ⭐ {distributorData.rating}/5</p>
             </div>
             <div className="flex gap-3">
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <input
                   type="text"
-                  placeholder="Scan or enter batch ID"
+                  placeholder={t('distributor_scan_placeholder')}
                   value={scanId}
                   onChange={(e) => setScanId(e.target.value)}
                   className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -206,7 +222,7 @@ function Distributor() {
                   onClick={handleScanQR}
                   className="ml-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
                 >
-                  📱 Scan
+                  📱 {t('distributor_scan')}
                 </button>
               </div>
             </div>
@@ -222,7 +238,7 @@ function Distributor() {
         >
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Total Deliveries</span>
+              <span className="text-gray-600 text-sm">{t('distributor_total_deliveries')}</span>
               <span className="text-2xl">📦</span>
             </div>
             <div className="text-2xl font-bold text-gray-900">{distributorData.totalDeliveries}</div>
@@ -230,7 +246,7 @@ function Distributor() {
           
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Active Routes</span>
+              <span className="text-gray-600 text-sm">{t('distributor_active_routes')}</span>
               <span className="text-2xl">🚛</span>
             </div>
             <div className="text-2xl font-bold text-blue-600">{distributorData.activeRoutes}</div>
@@ -238,7 +254,7 @@ function Distributor() {
           
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">On-Time Rate</span>
+              <span className="text-gray-600 text-sm">{t('distributor_on_time_rate')}</span>
               <span className="text-2xl">⏰</span>
             </div>
             <div className="text-2xl font-bold text-green-600">{distributorData.onTimeRate}%</div>
@@ -246,7 +262,7 @@ function Distributor() {
           
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Avg Delivery</span>
+              <span className="text-gray-600 text-sm">{t('distributor_avg_delivery')}</span>
               <span className="text-2xl">🕐</span>
             </div>
             <div className="text-2xl font-bold text-amber-600">{distributorData.avgDeliveryTime}</div>
@@ -269,7 +285,7 @@ function Distributor() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Active Shipments ({activeBatches.length})
+              {t('distributor_tab_active')} ({activeBatches.length})
             </button>
             <button
               onClick={() => setActiveTab("pending")}
@@ -279,7 +295,7 @@ function Distributor() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Pending Pickups ({pendingPickups.length})
+              {t('distributor_tab_pending')} ({pendingPickups.length})
             </button>
             <button
               onClick={() => setActiveTab("completed")}
@@ -289,7 +305,7 @@ function Distributor() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Completed
+              {t('distributor_tab_completed')}
             </button>
           </div>
         </motion.div>
@@ -312,25 +328,25 @@ function Distributor() {
                         {batch.status}
                       </span>
                       <span className={`text-sm font-medium ${getPriorityColor(batch.priority)}`}>
-                        {batch.priority.toUpperCase()} PRIORITY
+                        {batch.priority === 'high' ? t('distributor_priority_high') : batch.priority === 'medium' ? t('distributor_priority_medium') : t('distributor_priority_low')}
                       </span>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
-                        <p className="text-gray-600 text-sm">Route</p>
+                        <p className="text-gray-600 text-sm">{t('distributor_route')}</p>
                         <p className="font-medium">{batch.route}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Weight</p>
+                        <p className="text-gray-600 text-sm">{t('distributor_weight')}</p>
                         <p className="font-medium">{batch.weight}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">From</p>
+                        <p className="text-gray-600 text-sm">{t('distributor_from')}</p>
                         <p className="font-medium">{batch.farmer}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">To</p>
+                        <p className="text-gray-600 text-sm">{t('distributor_to')}</p>
                         <p className="font-medium">{batch.retailer}</p>
                       </div>
                     </div>
@@ -341,29 +357,35 @@ function Distributor() {
                         <span>🌡️ {batch.temperature}</span>
                       )}
                       {batch.gpsTracking && (
-                        <span className="text-green-600">📡 GPS Active</span>
+                        <span className="text-green-600">📡 {t('gps_active')}</span>
                       )}
                     </div>
                   </div>
 
                   <div className="lg:w-64">
                     <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                      <div className="text-sm text-gray-600 mb-1">Pickup</div>
+                      <div className="text-sm text-gray-600 mb-1">{t('distributor_pickup')}</div>
                       <div className="font-medium text-sm">{batch.pickupDate}</div>
-                      <div className="text-sm text-gray-600 mt-2 mb-1">Expected Delivery</div>
+                      <div className="text-sm text-gray-600 mt-2 mb-1">{t('distributor_expected_delivery')}</div>
                       <div className="font-medium text-sm">{batch.expectedDelivery}</div>
                     </div>
 
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleUpdateStatus(batch)}
-                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                        className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
                       >
                         Update Status
                       </button>
+                      <QRGenerator
+                        productId={batch.id}
+                        productName={batch.product}
+                        onSuccess={() => console.log('QR generated for', batch.id)}
+                        onError={(error) => console.error('QR generation failed:', error)}
+                      />
                       <Link
                         to={`/trace/${batch.id}`}
-                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+                        className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
                       >
                         Track
                       </Link>
@@ -420,15 +442,23 @@ function Distributor() {
                     </div>
                   </div>
 
-                  <div className="lg:w-48">
-                    <button
-                      onClick={() => handleAcceptBatch(batch)}
-                      className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors mb-2"
+                  <div className="lg:w-48 space-y-2">
+                    <Link
+                      to={`/trace/${batch.id}`}
+                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center block"
                     >
-                      Accept Pickup
-                    </button>
+                      View Trace
+                    </Link>
+                    <div className="w-full">
+                      <QRGenerator
+                        productId={batch.id}
+                        productName={batch.product}
+                        onSuccess={() => console.log('QR generated for', batch.id)}
+                        onError={(error) => console.error('QR generation failed:', error)}
+                      />
+                    </div>
                     <button className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-sm hover:bg-gray-200 transition-colors">
-                      View Details
+                      Download Report
                     </button>
                   </div>
                 </div>
@@ -508,7 +538,7 @@ function Distributor() {
             className="bg-white rounded-2xl p-6 w-full max-w-md"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Accept Pickup</h2>
+              <h2 className="text-xl font-bold text-gray-900">{t('distributor_accept_pickup_title')}</h2>
               <button
                 onClick={() => setShowAcceptModal(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -524,12 +554,12 @@ function Distributor() {
               </div>
               
               <div>
-                <p className="text-sm text-gray-600">Route</p>
+                <p className="text-sm text-gray-600">{t('distributor_route')}</p>
                 <p className="font-medium">{selectedBatch.pickupLocation} → {selectedBatch.deliveryLocation}</p>
               </div>
               
               <div>
-                <p className="text-sm text-gray-600">Estimated Time</p>
+                <p className="text-sm text-gray-600">{t('distributor_estimated_time')}</p>
                 <p className="font-medium">{selectedBatch.estimatedTime}</p>
               </div>
             </div>
@@ -539,7 +569,7 @@ function Distributor() {
                 onClick={() => setShowAcceptModal(false)}
                 className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {t('distributor_cancel')}
               </button>
               <button
                 onClick={() => {
@@ -548,7 +578,7 @@ function Distributor() {
                 }}
                 className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors"
               >
-                Accept & Start Route
+                {t('distributor_accept_start')}
               </button>
             </div>
           </motion.div>
@@ -564,7 +594,7 @@ function Distributor() {
             className="bg-white rounded-2xl p-6 w-full max-w-md"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Update Status</h2>
+              <h2 className="text-xl font-bold text-gray-900">{t('distributor_update_status_title')}</h2>
               <button
                 onClick={() => setShowUpdateModal(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -581,7 +611,7 @@ function Distributor() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Status
+                  {t('distributor_new_status')}
                 </label>
                 <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                   <option>Pickup Confirmed</option>
@@ -593,7 +623,7 @@ function Distributor() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Temperature (°C)
+                  {t('distributor_current_temp')}
                 </label>
                 <input
                   type="number"
@@ -604,7 +634,7 @@ function Distributor() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Notes
+                  {t('distributor_notes')}
                 </label>
                 <textarea
                   placeholder="Add any notes about the shipment..."
@@ -619,7 +649,7 @@ function Distributor() {
                 onClick={() => setShowUpdateModal(false)}
                 className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {t('distributor_cancel')}
               </button>
               <button
                 onClick={() => {
@@ -628,7 +658,7 @@ function Distributor() {
                 }}
                 className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
               >
-                Update Status
+                {t('distributor_update_status')}
               </button>
             </div>
           </motion.div>

@@ -1,9 +1,12 @@
-import { useParams, Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import apiService from "../services/api";
+import { useI18n } from "../i18n/I18nContext";
+import RusticTimeline from "../components/RusticTimeline";
 
 function TraceView() {
+  const { t } = useI18n();
   const { id } = useParams();
   const location = useLocation();
   const [traceData, setTraceData] = useState<any>(null);
@@ -46,280 +49,267 @@ function TraceView() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading product information...</p>
+      <div className="min-h-screen textured-bg farm-bg flex items-center justify-center">
+        <div className="text-center parchment-card">
+          <div className="swaying-leaf text-6xl mb-4">🍃</div>
+          <p className="text-rustic-brown font-body">{t('loading')}</p>
         </div>
       </div>
     );
   }
 
-  if (error || !traceData) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">❌</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h1>
-          <p className="text-gray-600 mb-6">{error || "The product you're looking for doesn't exist."}</p>
-          <Link
-            to="/consumer"
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
+      <div className="min-h-screen textured-bg farm-bg flex items-center justify-center">
+        <div className="text-center parchment-card">
+          <div className="text-rustic-brown text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-heading text-rustic-brown mb-2">{t('error')}</h2>
+          <p className="text-rustic-brown/80 font-body mb-4">{error}</p>
+          <Link 
+            to="/" 
+            className="rustic-button"
           >
-            Back to Search
+            {t('goHome')}
           </Link>
         </div>
       </div>
     );
   }
 
-  // Transform API data to match UI expectations
-  const transformedData = {
-    id: traceData.productId || id,
-    product: traceData.productType || "Unknown Product",
-    variety: traceData.productType || "Unknown Variety",
-    weight: traceData.batchSize || "Unknown Weight",
-    harvestDate: traceData.harvestDate || "Unknown Date",
-    freshnessScore: 85, // Mock score
-    certifications: ["Organic", "Fair Trade"], // Mock certifications
-    farmer: {
-      name: traceData.transactions?.[0]?.name || "Unknown Farmer",
-      location: traceData.transactions?.[0]?.location || "Unknown Location",
-      contact: "+91 98765 43210", // Mock contact
-      rating: 4.8, // Mock rating
-      photo: "https://images.pexels.com/photos/2132227/pexels-photo-2132227.jpeg?auto=compress&cs=tinysrgb&w=400"
+  if (!traceData) {
+    return (
+      <div className="min-h-screen textured-bg farm-bg flex items-center justify-center">
+        <div className="text-center parchment-card">
+          <div className="text-rustic-brown/60 text-6xl mb-4">📦</div>
+          <h2 className="text-2xl font-heading text-rustic-brown mb-2">{t('productNotFound')}</h2>
+          <p className="text-rustic-brown/80 font-body mb-4">{t('productNotFoundDesc')}</p>
+          <Link 
+            to="/" 
+            className="rustic-button"
+          >
+            {t('goHome')}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Transform trace data for RusticTimeline
+  const timelineSteps = [
+    {
+      id: 'farm',
+      title: t('farming'),
+      description: `Harvested by ${traceData.farmerName || t('unknownFarmer')}`,
+      date: traceData.harvestDate || t('unknownDate'),
+      location: traceData.farmLocation || t('unknownLocation'),
+      status: 'completed' as const,
+      icon: '🌱',
+      details: {
+        quality: traceData.qualityScore ? `${traceData.qualityScore}%` : undefined,
+        certifications: traceData.certifications
+      }
     },
-    journey: traceData.transactions?.map((tx: any, index: number) => ({
-      stage: tx.role,
-      actor: tx.name,
-      date: new Date(tx.timestamp).toLocaleString(),
-      location: tx.location,
-      status: index === traceData.transactions.length - 1 ? "current" : "completed",
-      notes: tx.handlingInfo,
-      temperature: "22°C" // Mock temperature
-    })) || [],
-    pricing: {
-      farmGate: 45,
-      transport: 8,
-      retailMarkup: 12,
-      retail: 65,
-      marketAverage: 70
+    {
+      id: 'processing',
+      title: t('processing'),
+      description: `Processed by ${traceData.processorName || t('unknownProcessor')}`,
+      date: traceData.processingDate || t('pending'),
+      location: traceData.processingLocation || t('unknownLocation'),
+      status: traceData.processingDate ? 'completed' as const : 'pending' as const,
+      icon: '🏭',
+      details: {
+        temperature: traceData.processingTemp,
+        humidity: traceData.processingHumidity
+      }
+    },
+    {
+      id: 'distribution',
+      title: t('distribution'),
+      description: `Distributed by ${traceData.distributorName || t('unknownDistributor')}`,
+      date: traceData.distributionDate || t('pending'),
+      location: traceData.distributionLocation || t('unknownLocation'),
+      status: traceData.distributionDate ? 'completed' as const : 'pending' as const,
+      icon: '🚛',
+      details: {
+        temperature: traceData.transportTemp,
+        quality: traceData.distributionQuality
+      }
+    },
+    {
+      id: 'retail',
+      title: t('retail'),
+      description: `Available at ${traceData.retailerName || t('unknownRetailer')}`,
+      date: traceData.retailDate || t('current'),
+      location: traceData.retailLocation || t('unknownLocation'),
+      status: traceData.retailDate ? 'completed' as const : 'current' as const,
+      icon: '🏪',
+      details: {
+        quality: traceData.retailQuality,
+        certifications: traceData.retailCertifications
+      }
     }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed": return "bg-green-100 text-green-800 border-green-200";
-      case "current": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "pending": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      default: return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getFreshnessColor = (score: number) => {
-    if (score >= 90) return "text-green-600";
-    if (score >= 70) return "text-yellow-600";
-    return "text-red-600";
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">🌱</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">FarmTrace</span>
-            </Link>
-            <button className="text-green-600 hover:text-green-700">
-              Share
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Product Header */}
+    <div className="min-h-screen textured-bg farm-bg font-body">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-sm p-6 mb-6"
+          className="wooden-signboard mb-8"
         >
-          <div className="flex flex-col md:flex-row gap-6">
-            <img
-              src={transformedData.farmer.photo}
-              alt={transformedData.product}
-              className="w-full md:w-48 h-48 object-cover rounded-xl"
-            />
-            <div className="flex-1">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                    {transformedData.product}
-                  </h1>
-                  <p className="text-gray-600 mb-1">ID: {transformedData.id}</p>
-                  <p className="text-gray-600">{transformedData.variety} • {transformedData.weight}</p>
-                </div>
-                <div className="text-right">
-                  <div className={`text-3xl font-bold ${getFreshnessColor(transformedData.freshnessScore)}`}>
-                    {transformedData.freshnessScore}%
-                  </div>
-                  <p className="text-sm text-gray-600">Freshness Score</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                {transformedData.certifications.map((cert) => (
-                  <span
-                    key={cert}
-                    className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
-                  >
-                    ✓ {cert}
-                  </span>
-                ))}
-              </div>
+          <h1 className="text-3xl font-heading text-rustic-brown mb-2">
+            🔍 {t('productTraceability')}
+          </h1>
+          <p className="text-rustic-brown/80 font-body">
+            {t('traceabilityDesc')}
+          </p>
+        </motion.div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
+        {/* Product Info Card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="parchment-card mb-8"
+        >
+          <div className="flex items-start gap-6">
+            <div className="w-24 h-24 bg-rustic-green/20 rounded-lg flex items-center justify-center text-4xl">
+              🌾
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-heading text-rustic-brown mb-2">
+                {traceData.productName || traceData.name || t('unknownProduct')}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-600">Harvest Date</p>
-                  <p className="font-medium">{transformedData.harvestDate}</p>
+                  <span className="font-semibold text-rustic-brown">{t('productId')}:</span>
+                  <span className="ml-2 text-rustic-brown/80">{traceData.id || id}</span>
                 </div>
                 <div>
-                  <p className="text-gray-600">Current Price</p>
-                  <p className="font-medium">₹{transformedData.pricing.retail}/kg</p>
+                  <span className="font-semibold text-rustic-brown">{t('batchNumber')}:</span>
+                  <span className="ml-2 text-rustic-brown/80">{traceData.batchNumber || t('unknown')}</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-rustic-brown">{t('harvestDate')}:</span>
+                  <span className="ml-2 text-rustic-brown/80">{traceData.harvestDate || t('unknown')}</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-rustic-brown">{t('expiryDate')}:</span>
+                  <span className="ml-2 text-rustic-brown/80">{traceData.expiryDate || t('unknown')}</span>
                 </div>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Farmer Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-sm p-6 mb-6"
-        >
-          <h2 className="text-xl font-bold text-gray-900 mb-4">From the Farm</h2>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">🌾</span>
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900">{transformedData.farmer.name}</h3>
-              <p className="text-gray-600">{transformedData.farmer.location}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="flex text-yellow-400">
-                  {"★".repeat(Math.floor(transformedData.farmer.rating))}
-                </div>
-                <span className="text-sm text-gray-600">{transformedData.farmer.rating}/5</span>
-              </div>
-            </div>
-            <button className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-              Contact
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Journey Timeline */}
+        {/* Rustic Timeline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-sm p-6 mb-6"
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Journey Timeline</h2>
-          <div className="space-y-6">
-            {transformedData.journey.map((step, index) => (
-              <div key={index} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className={`w-4 h-4 rounded-full ${
-                    step.status === 'completed' ? 'bg-green-500' : 
-                    step.status === 'current' ? 'bg-blue-500' : 'bg-gray-300'
-                  }`}></div>
-                  {index < transformedData.journey.length - 1 && (
-                    <div className="w-0.5 h-16 bg-gray-200 mt-2"></div>
-                  )}
+          <RusticTimeline steps={timelineSteps} />
+        </motion.div>
+
+        {/* Additional Details */}
+        {(traceData.certifications || traceData.qualityTests || traceData.sustainabilityScore) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="parchment-card mt-8"
+          >
+            <h3 className="text-xl font-heading text-rustic-brown mb-4">
+              📋 {t('additionalInfo')}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {traceData.certifications && (
+                <div>
+                  <h4 className="font-semibold text-rustic-brown mb-2">{t('certifications')}</h4>
+                  <div className="space-y-1">
+                    {traceData.certifications.map((cert: string, index: number) => (
+                      <span key={index} className="inline-block bg-rustic-green/20 text-rustic-green px-2 py-1 rounded text-sm mr-2 mb-1">
+                        ✓ {cert}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex-1 pb-8">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-bold text-gray-900">{step.stage}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(step.status)}`}>
-                      {step.status}
+              )}
+              {traceData.qualityTests && (
+                <div>
+                  <h4 className="font-semibold text-rustic-brown mb-2">{t('qualityTests')}</h4>
+                  <div className="space-y-1">
+                    {Object.entries(traceData.qualityTests).map(([test, result]) => (
+                      <div key={test} className="text-sm">
+                        <span className="text-rustic-brown">{test}:</span>
+                        <span className="ml-2 text-rustic-green">✓ {String(result)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {traceData.sustainabilityScore && (
+                <div>
+                  <h4 className="font-semibold text-rustic-brown mb-2">{t('sustainability')}</h4>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-rustic-cream rounded-full h-2">
+                      <div 
+                        className="bg-rustic-green h-2 rounded-full transition-all duration-1000"
+                        style={{ width: `${traceData.sustainabilityScore}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-semibold text-rustic-green">
+                      {traceData.sustainabilityScore}%
                     </span>
                   </div>
-                  <p className="text-gray-600 text-sm mb-1">{step.actor} • {step.location}</p>
-                  <p className="text-gray-500 text-sm mb-2">{step.date}</p>
-                  {step.temperature && (
-                    <p className="text-blue-600 text-sm mb-2">🌡️ {step.temperature}</p>
-                  )}
-                  <p className="text-gray-700 text-sm">{step.notes}</p>
-                  {step.photo && (
-                    <img
-                      src={step.photo}
-                      alt={step.stage}
-                      className="w-24 h-24 object-cover rounded-lg mt-3"
-                    />
-                  )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+              )}
+            </div>
+          </motion.div>
+        )}
 
-        {/* Price Breakdown */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl shadow-sm p-6 mb-6"
-        >
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Price Breakdown</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Farm Gate Price</span>
-              <span className="font-medium">₹{transformedData.pricing.farmGate}/kg</span>
+        {/* Pricing Information */}
+        {traceData.pricing && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="parchment-card mt-8"
+          >
+            <h3 className="text-xl font-heading text-rustic-brown mb-4">
+              💰 {t('pricingInfo')}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {Object.entries(traceData.pricing).map(([stage, price]) => (
+                <div key={stage} className="text-center p-4 bg-rustic-cream/50 rounded-lg">
+                  <div className="text-2xl mb-2">
+                    {stage === 'farm' && '🌱'}
+                    {stage === 'processing' && '🏭'}
+                    {stage === 'distribution' && '🚛'}
+                    {stage === 'retail' && '🏪'}
+                  </div>
+                  <div className="font-semibold text-rustic-brown capitalize">{stage}</div>
+                  <div className="text-rustic-green font-bold">₹{price}</div>
+                </div>
+              ))}
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Transportation</span>
-              <span className="font-medium">₹{transformedData.pricing.transport}/kg</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Retail Markup</span>
-              <span className="font-medium">₹{transformedData.pricing.retailMarkup}/kg</span>
-            </div>
-            <hr className="border-gray-200" />
-            <div className="flex justify-between items-center text-lg font-bold">
-              <span>Final Price</span>
-              <span className="text-green-600">₹{transformedData.pricing.retail}/kg</span>
-            </div>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <p className="text-sm text-green-700">
-                💰 You're saving ₹{transformedData.pricing.marketAverage - transformedData.pricing.retail} compared to market average (₹{transformedData.pricing.marketAverage}/kg)
-              </p>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
-        {/* Actions */}
+        {/* Back Button */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex flex-col sm:flex-row gap-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-8 text-center"
         >
-          <button className="flex-1 bg-green-600 text-white py-3 px-6 rounded-xl font-medium hover:bg-green-700 transition-colors">
-            Save to Favorites
-          </button>
-          <button className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-medium hover:bg-gray-200 transition-colors">
-            Report Issue
-          </button>
-          <button className="px-6 py-3 bg-blue-100 text-blue-700 rounded-xl font-medium hover:bg-blue-200 transition-colors">
-            Share
-          </button>
+          <Link 
+            to="/" 
+            className="rustic-button inline-flex items-center gap-2"
+          >
+            ← {t('backToHome')}
+          </Link>
         </motion.div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 const qrRouter = require('./qr.js');
@@ -45,9 +46,15 @@ app.use(cors());
 app.use(securityHeaders);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-// Serve static assets from new UI build if present, else fallback to legacy public
-const staticPath = path.join(__dirname, '..', 'public');
-app.use(express.static(staticPath));
+// Serve static assets from UI build; try multiple locations for robustness
+const publicPath = path.join(__dirname, '..', 'public');
+const distPath = path.join(__dirname, '..', 'dist');
+const frontendDistPath = path.join(__dirname, '..', 'frontend', 'dist');
+
+// Prefer public/, but also mount dist/ and frontend/dist as fallbacks
+if (fs.existsSync(publicPath)) app.use(express.static(publicPath));
+if (fs.existsSync(distPath)) app.use(express.static(distPath));
+if (fs.existsSync(frontendDistPath)) app.use(express.static(frontendDistPath));
 
 // Routes
 app.use('/api/auth', authRouter);
@@ -202,6 +209,34 @@ app.get('/api/qr-verify/:productId', async (req, res) => {
   }
 });
 
+// Public redirect for QR codes pointing to /verify/:productId
+// This redirects users (e.g., phone camera QR scanners) to the SPA route /trace/:productId
+app.get('/verify/:productId', (req, res) => {
+  const { productId } = req.params;
+  // If the React app is served from same host, redirect to the SPA path
+  res.redirect(302, `/trace/${encodeURIComponent(productId)}`);
+});
+
+// Handle trace route for direct access (fallback for SPA routing)
+app.get('/trace/:productId', (req, res) => {
+  const { productId } = req.params;
+  // For direct access, serve the SPA which will handle the routing
+  const candidateIndexPaths = [
+    path.join(publicPath, 'index.html'),
+    path.join(distPath, 'index.html'),
+    path.join(frontendDistPath, 'index.html')
+  ];
+  const existingIndex = candidateIndexPaths.find(p => {
+    try { return fs.existsSync(p); } catch { return false; }
+  });
+  
+  if (existingIndex) {
+    res.sendFile(existingIndex);
+  } else {
+    res.status(404).send('Application not built. Please run the build process.');
+  }
+});
+
 // ========== WEB INTERFACE ROUTES ==========
 
 // Removed legacy HTML route; React app handles UI
@@ -287,13 +322,23 @@ app.listen(PORT, () => {
 
 // SPA fallback for React Router (new UI)
 try {
-  const indexHtmlPath = path.join(staticPath, 'index.html');
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
-    res.sendFile(indexHtmlPath, (err) => {
-      if (err) next();
-    });
+  const candidateIndexPaths = [
+    path.join(publicPath, 'index.html'),
+    path.join(distPath, 'index.html'),
+    path.join(frontendDistPath, 'index.html')
+  ];
+  const existingIndex = candidateIndexPaths.find(p => {
+    try { return fs.existsSync(p); } catch { return false; }
   });
+
+  if (existingIndex) {
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) return next();
+      res.sendFile(existingIndex, (err) => {
+        if (err) next();
+      });
+    });
+  }
 } catch (e) {
-  // No SPA fallback if static path missing
+  // No SPA fallback if index not found
 }

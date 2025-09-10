@@ -284,7 +284,7 @@ function Admin() {
               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">🌱</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">FarmTrace</span>
+              <span className="text-xl font-bold text-gray-900">FarmToFork</span>
             </Link>
             <div className="flex items-center space-x-4">
               <span className="text-gray-600">Admin Panel</span>

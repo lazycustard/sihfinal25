@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 import ParallaxFarmBackground from "../smthn";
+import { useI18n } from "../i18n/I18nContext";
 
 
 interface GlassPanelProps {
@@ -28,6 +29,7 @@ function GlassPanel({ children, className = "" } :GlassPanelProps) {
 }
 
 function Landing() {
+  const { t } = useI18n();
   const [searchId, setSearchId] = useState("");
 
   const roles = [
@@ -91,10 +93,10 @@ function Landing() {
               <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">🌱</span>
               </div>
-              <h1 className="text-2xl heading-font font-bold text-cream">FarmTrace</h1>
+              <h1 className="text-2xl heading-font font-bold text-cream">{t('app_name')}</h1>
             </div>
             <Link to="/login" className="font-medium text-cream sign-hover">
-              Sign In
+              {t('sign_in')}
             </Link>
           </div>
         </div>
@@ -181,7 +183,7 @@ function Landing() {
       <footer className="py-8 px-4 bg-wood text-center">
         <div className="max-w-6xl mx-auto">
           <p className="text-sm text-gray-500">
-            &copy; 2023 FarmTrace. All rights reserved.
+            &copy; 2023 FarmToFork. All rights reserved.
           </p>
         </div>
       </footer>

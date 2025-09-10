@@ -3,8 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
+import { useI18n } from "../i18n/I18nContext";
+import VoiceInput from "../components/VoiceInput";
 
 function Farmer() {
+  const { t } = useI18n();
   const [showCreateBatch, setShowCreateBatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +19,9 @@ function Farmer() {
     harvestDate: "",
     basePrice: "",
     certifications: [] as string[],
-    photos: [] as string[]
+    photos: [] as string[],
+    farmerName: "",
+    farmerId: ""
   });
 
   const { user } = useAuth();
@@ -148,7 +153,9 @@ function Farmer() {
           harvestDate: "",
           basePrice: "",
           certifications: [],
-          photos: []
+          photos: [],
+          farmerName: "",
+          farmerId: ""
         });
       } else {
         setError(response.error || 'Failed to create product');
@@ -162,21 +169,21 @@ function Farmer() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen textured-bg farm-bg font-body">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="rustic-header shadow-lg border-b-2 border-warm-brown">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">🌱</span>
+              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <span className="text-white font-bold text-lg swaying-leaf hand-drawn-icon">🌱</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">FarmTrace</span>
+              <span className="text-xl font-bold text-white drop-shadow-sm font-heading">{t('app_name')}</span>
             </Link>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Welcome, {farmerData.name}</span>
-              <button className="text-green-600 hover:text-green-700">
-                Profile
+              <span className="text-green-100">{t('retailer_welcome')}, {farmerData.name}</span>
+              <button className="text-white hover:text-green-200 bg-white bg-opacity-10 px-3 py-1 rounded-lg backdrop-blur-sm transition-colors">
+                {t('profile')}
               </button>
             </div>
           </div>
@@ -192,15 +199,15 @@ function Farmer() {
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Farmer Dashboard</h1>
-              <p className="text-gray-600">{farmerData.location} • ⭐ {farmerData.rating}/5</p>
+              <h1 className="text-3xl font-bold text-deep-green mb-2 drop-shadow-sm font-heading">{t('farmer_dashboard')}</h1>
+              <p className="text-warm-brown bg-soft-cream px-4 py-2 rounded-full shadow-sm font-body">{farmerData.location} • ⭐ {farmerData.rating}/5</p>
             </div>
             <button
               onClick={() => setShowCreateBatch(true)}
-              className="bg-green-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-green-700 transition-colors flex items-center gap-2"
+              className="rustic-btn px-6 py-3 font-medium flex items-center gap-2 font-body"
             >
-              <span>➕</span>
-              Create New Batch
+              <span className="hand-drawn-icon">➕</span>
+              {t('create_new_batch')}
             </button>
           </div>
         </motion.div>
@@ -212,36 +219,36 @@ function Farmer() {
           transition={{ delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
         >
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Total Batches</span>
-              <span className="text-2xl">📦</span>
+              <span className="text-warm-brown text-sm font-body">{t('total_batches')}</span>
+              <span className="text-2xl hand-drawn-icon">📦</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{farmerData.totalBatches}</div>
+            <div className="text-2xl font-bold text-deep-green font-heading">{farmerData.totalBatches}</div>
           </div>
           
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Active Batches</span>
-              <span className="text-2xl">🚛</span>
+              <span className="text-warm-brown text-sm font-body">{t('active_batches')}</span>
+              <span className="text-2xl hand-drawn-icon">🚛</span>
             </div>
-            <div className="text-2xl font-bold text-blue-600">{farmerData.activeBatches}</div>
+            <div className="text-2xl font-bold text-deep-green font-heading">{farmerData.activeBatches}</div>
           </div>
           
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Total Earnings</span>
-              <span className="text-2xl">💰</span>
+              <span className="text-warm-brown text-sm font-body">{t('total_earnings')}</span>
+              <span className="text-2xl hand-drawn-icon">💰</span>
             </div>
-            <div className="text-2xl font-bold text-green-600">₹{farmerData.totalEarnings.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-accent-yellow font-heading">₹{farmerData.totalEarnings.toLocaleString()}</div>
           </div>
           
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">This Month</span>
-              <span className="text-2xl">📈</span>
+              <span className="text-warm-brown text-sm font-body">{t('this_month')}</span>
+              <span className="text-2xl hand-drawn-icon">📈</span>
             </div>
-            <div className="text-2xl font-bold text-amber-600">₹{farmerData.monthlyEarnings.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-accent-yellow font-heading">₹{farmerData.monthlyEarnings.toLocaleString()}</div>
           </div>
         </motion.div>
 
@@ -250,13 +257,11 @@ function Farmer() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-sm p-6"
+          className="rustic-card p-6"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Recent Batches</h2>
-            <button className="text-green-600 hover:text-green-700 font-medium">
-              View All
-            </button>
+            <h2 className="text-xl font-bold text-gray-900">{t('recent_batches')}</h2>
+            <button className="text-green-600 hover:text-green-700 font-medium">{t('view_all')}</button>
           </div>
           
           <div className="space-y-4">
@@ -273,15 +278,13 @@ function Farmer() {
                     <p className="text-gray-600 text-sm mb-1">
                       ID: {batch.id} • {batch.variety} • {batch.weight}
                     </p>
-                    <p className="text-gray-500 text-sm">
-                      Created: {batch.createdDate} • Buyer: {batch.buyer}
-                    </p>
+                    <p className="text-gray-500 text-sm">{t('created')}: {batch.createdDate} • {t('buyer')}: {batch.buyer}</p>
                   </div>
                   
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <div className="text-lg font-bold text-green-600">₹{batch.price}/kg</div>
-                      <div className="text-sm text-gray-500">Base Price</div>
+                      <div className="text-sm text-gray-500">{t('base_price')}</div>
                     </div>
                     
                     <div className="flex gap-2">
@@ -289,13 +292,8 @@ function Farmer() {
                         to={`/trace/${batch.id}`}
                         className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
                       >
-                        Track
+                        {t('track')}
                       </Link>
-                      {batch.qrGenerated && (
-                        <button className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors">
-                          Print QR
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -314,7 +312,7 @@ function Farmer() {
             className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Create New Batch</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t('create_new_batch_title')}</h2>
               <button
                 onClick={() => setShowCreateBatch(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -324,12 +322,29 @@ function Farmer() {
             </div>
 
             <div className="space-y-6">
+              {/* Farmer Information */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">👨‍🌾 Farmer Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <VoiceInput
+                    value={newBatch.farmerName}
+                    onChange={(value) => setNewBatch(prev => ({ ...prev, farmerName: value }))}
+                    placeholder="Enter farmer name"
+                    label="Farmer Name *"
+                  />
+                  <VoiceInput
+                    value={newBatch.farmerId}
+                    onChange={(value) => setNewBatch(prev => ({ ...prev, farmerId: value }))}
+                    placeholder="Enter farmer ID"
+                    label="Farmer ID *"
+                  />
+                </div>
+              </div>
+
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product Name *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('product_name')} *</label>
                   <input
                     type="text"
                     value={newBatch.product}
@@ -340,9 +355,7 @@ function Farmer() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Variety *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('variety')} *</label>
                   <input
                     type="text"
                     value={newBatch.variety}
@@ -355,9 +368,7 @@ function Farmer() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Weight (kg) *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('weight_kg')} *</label>
                   <input
                     type="number"
                     value={newBatch.weight}
@@ -368,9 +379,7 @@ function Farmer() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Base Price (₹/kg) *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('base_price_per_kg')} *</label>
                   <input
                     type="number"
                     value={newBatch.basePrice}
@@ -382,9 +391,7 @@ function Farmer() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Harvest Date *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('harvest_date')} *</label>
                 <input
                   type="date"
                   value={newBatch.harvestDate}
@@ -395,9 +402,7 @@ function Farmer() {
 
               {/* Certifications */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Certifications
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-3">{t('certifications_label')}</label>
                 <div className="flex flex-wrap gap-2">
                   {certificationOptions.map((cert) => (
                     <button
@@ -417,13 +422,11 @@ function Farmer() {
 
               {/* Photos */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Product Photos
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-3">{t('product_photos')}</label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-green-400 transition-colors cursor-pointer">
                   <div className="text-4xl mb-2">📷</div>
-                  <p className="text-gray-600 mb-2">Click to upload photos</p>
-                  <p className="text-sm text-gray-500">PNG, JPG up to 10MB each</p>
+                  <p className="text-gray-600 mb-2">{t('click_to_upload')}</p>
+                  <p className="text-sm text-gray-500">{t('png_jpg_hint')}</p>
                 </div>
               </div>
 
@@ -433,13 +436,15 @@ function Farmer() {
                   onClick={() => setShowCreateBatch(false)}
                   className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={handleCreateBatch}
-                  className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors"
+                  disabled={!newBatch.product || !newBatch.variety || !newBatch.weight || !newBatch.basePrice || !newBatch.harvestDate || !newBatch.farmerName || !newBatch.farmerId}
+                  className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Create Batch & Generate QR
+                  <span>📦</span>
+                  {t('create_batch') || 'Create Batch'}
                 </button>
               </div>
             </div>

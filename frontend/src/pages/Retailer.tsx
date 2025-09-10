@@ -1,8 +1,11 @@
- import { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import MultilingualProduct from '../components/MultilingualProduct';
 import { motion } from "framer-motion";
+import { useI18n } from '../i18n/I18nContext';
 
 function Retailer() {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState("inventory");
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
@@ -61,7 +64,7 @@ function Retailer() {
     },
     {
       id: "POT003",
-      product: "Red Potatoes",
+      product: "potato",
       supplier: "Mountain View Farm",
       currentStock: 78,
       minStock: 25,
@@ -132,7 +135,7 @@ function Retailer() {
       name: "Green Valley Farm",
       location: "Punjab, India",
       rating: 4.8,
-      specialties: ["Tomatoes", "Peppers", "Herbs"],
+      specialties: ["tomato", "peppers", "herbs"],
       totalOrders: 45,
       avgDeliveryTime: "18 hours",
       reliability: 98,
@@ -156,7 +159,7 @@ function Retailer() {
       name: "Mountain View Farm",
       location: "Himachal Pradesh, India",
       rating: 4.7,
-      specialties: ["Potatoes", "Onions", "Garlic"],
+      specialties: ["potato", "onion", "garlic"],
       totalOrders: 28,
       avgDeliveryTime: "36 hours",
       reliability: 92,
@@ -237,19 +240,19 @@ function Retailer() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen textured-bg farm-bg font-body">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="wooden-signboard mb-8">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-rustic-green rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">🌱</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">FarmTrace</span>
+              <span className="text-xl font-heading text-rustic-brown">🌾 FarmToFork</span>
             </Link>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Welcome, {retailerData.name}</span>
+              <span className="text-rustic-brown/80 font-body">Welcome, {retailerData.name}</span>
               <button className="text-green-600 hover:text-green-700">
                 Profile
               </button>
@@ -258,21 +261,21 @@ function Retailer() {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Dashboard Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="rustic-card p-6 mb-8"
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Retail Dashboard</h1>
-              <p className="text-gray-600">{retailerData.location} • ⭐ {retailerData.rating}/5</p>
+              <h1 className="text-3xl font-heading text-deep-green mb-2">Retail Dashboard</h1>
+              <p className="text-gray-600 font-body">{retailerData.location} • ⭐ {retailerData.rating}/5</p>
             </div>
             <button
               onClick={handleCreateOrder}
-              className="bg-green-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-green-700 transition-colors flex items-center gap-2"
+              className="rustic-btn font-body flex items-center gap-2"
             >
               <span>➕</span>
               Place New Order
@@ -285,38 +288,38 @@ function Retailer() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
         >
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Total Products</span>
+              <span className="font-body text-rustic-brown/80">{t('totalProducts')}</span>
               <span className="text-2xl">📦</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{retailerData.totalProducts}</div>
+            <div className="text-3xl font-heading text-rustic-brown">{retailerData.totalProducts}</div>
           </div>
           
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Low Stock Items</span>
+              <span className="font-body text-rustic-brown/80">{t('lowStockItems')}</span>
               <span className="text-2xl">⚠️</span>
             </div>
-            <div className="text-2xl font-bold text-yellow-600">{retailerData.lowStockItems}</div>
+            <div className="text-3xl font-heading text-yellow-600">{retailerData.lowStockItems}</div>
           </div>
           
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Monthly Revenue</span>
+              <span className="font-body text-rustic-brown/80">{t('monthlyRevenue')}</span>
               <span className="text-2xl">💰</span>
             </div>
-            <div className="text-2xl font-bold text-green-600">₹{retailerData.monthlyRevenue.toLocaleString()}</div>
+            <div className="text-3xl font-heading text-rustic-green">₹{retailerData.monthlyRevenue.toLocaleString()}</div>
           </div>
           
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="parchment-card p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Active Suppliers</span>
+              <span className="font-body text-rustic-brown/80">{t('activeSuppliers')}</span>
               <span className="text-2xl">🤝</span>
             </div>
-            <div className="text-2xl font-bold text-blue-600">{retailerData.activeSuppliers}</div>
+            <div className="text-3xl font-heading text-blue-600">{retailerData.activeSuppliers}</div>
           </div>
         </motion.div>
 
@@ -390,65 +393,65 @@ function Retailer() {
             className="space-y-4"
           >
             {inventory.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div key={item.id} className="parchment-card p-4">
                 <div className="flex flex-col lg:flex-row justify-between gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-bold text-gray-900">{item.product}</h3>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(item.status)}`}>
-                        {item.status.replace('_', ' ').toUpperCase()}
+                      <h3 className="text-xl font-heading text-rustic-brown">{item.product}</h3>
+                      <span className={`px-3 py-1 rounded-full text-sm font-body border ${getStatusColor(item.status)}`}>
+                        {t(item.status)}
                       </span>
-                      <span className="text-sm text-gray-500">{item.category}</span>
+                      <span className="text-sm text-rustic-brown/70 font-body">{item.category}</span>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 font-body">
                       <div>
-                        <p className="text-gray-600 text-sm">Supplier</p>
-                        <p className="font-medium">{item.supplier}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('supplier')}</p>
+                        <p className="font-medium text-rustic-brown">{item.supplier}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Stock Level</p>
-                        <p className="font-medium">{item.currentStock} / {item.maxStock} units</p>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <p className="text-rustic-brown/70 text-sm">{t('stockLevel')}</p>
+                        <p className="font-medium text-rustic-brown">{item.currentStock} / {item.maxStock} units</p>
+                        <div className="w-full bg-rustic-cream rounded-full h-2 mt-1">
                           <div 
                             className={`h-2 rounded-full ${
                               item.currentStock < item.minStock ? 'bg-red-500' : 
-                              item.currentStock < item.minStock * 1.5 ? 'bg-yellow-500' : 'bg-green-500'
+                              item.currentStock < item.minStock * 1.5 ? 'bg-yellow-500' : 'bg-rustic-green'
                             }`}
                             style={{ width: `${(item.currentStock / item.maxStock) * 100}%` }}
                           ></div>
                         </div>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Quality Score</p>
-                        <p className="font-medium">{item.qualityScore}%</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('qualityScore')}</p>
+                        <p className="font-medium text-rustic-brown">{item.qualityScore}%</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span>📅 Last restocked: {item.lastRestocked}</span>
-                      <span>⏰ Expires: {item.expiryDate}</span>
+                    <div className="flex items-center gap-4 text-sm text-rustic-brown/70 font-body">
+                      <span>📅 {t('lastRestocked')}: {item.lastRestocked}</span>
+                      <span>⏰ {t('expires')}: {item.expiryDate}</span>
                     </div>
                   </div>
 
                   <div className="lg:w-80">
-                    <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="bg-rustic-cream/50 rounded-xl p-4 mb-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm font-body">
                         <div>
-                          <p className="text-gray-600">Cost Price</p>
-                          <p className="font-medium">₹{item.costPrice}/kg</p>
+                          <p className="text-rustic-brown/70">{t('costPrice')}</p>
+                          <p className="font-medium text-rustic-brown">₹{item.costPrice}/kg</p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Selling Price</p>
-                          <p className="font-medium">₹{item.sellingPrice}/kg</p>
+                          <p className="text-rustic-brown/70">{t('sellingPrice')}</p>
+                          <p className="font-medium text-rustic-brown">₹{item.sellingPrice}/kg</p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Margin</p>
-                          <p className="font-medium text-green-600">{item.margin}%</p>
+                          <p className="text-rustic-brown/70">{t('margin')}</p>
+                          <p className="font-medium text-rustic-green">{item.margin}%</p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Min Stock</p>
-                          <p className="font-medium">{item.minStock} units</p>
+                          <p className="text-rustic-brown/70">{t('minStock')}</p>
+                          <p className="font-medium text-rustic-brown">{item.minStock} units</p>
                         </div>
                       </div>
                     </div>
@@ -456,12 +459,12 @@ function Retailer() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleUpdatePricing(item)}
-                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                        className="rustic-button-small flex-1"
                       >
-                        Update Pricing
+                        {t('updatePricing')}
                       </button>
-                      <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors">
-                        Restock
+                      <button className="rustic-button-secondary-small">
+                        {t('restock')}
                       </button>
                     </div>
                   </div>
@@ -480,49 +483,45 @@ function Retailer() {
             className="space-y-4"
           >
             {incomingOrders.map((order) => (
-              <div key={order.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div key={order.id} className="parchment-card p-4">
                 <div className="flex flex-col lg:flex-row justify-between gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-bold text-gray-900">{order.product}</h3>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
-                        {order.status.replace('_', ' ').toUpperCase()}
+                      <h3 className="text-xl font-heading text-rustic-brown">{order.product}</h3>
+                      <span className={`px-3 py-1 rounded-full text-sm font-body border ${getStatusColor(order.status)}`}>
+                        {t(order.status)}
                       </span>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 font-body">
                       <div>
-                        <p className="text-gray-600 text-sm">Supplier</p>
-                        <p className="font-medium">{order.supplier}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('supplier')}</p>
+                        <p className="font-medium text-rustic-brown">{order.supplier}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Quantity</p>
-                        <p className="font-medium">{order.quantity} units</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('quantity')}</p>
+                        <p className="font-medium text-rustic-brown">{order.quantity} units</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Order Date</p>
-                        <p className="font-medium">{order.orderDate}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('orderDate')}</p>
+                        <p className="font-medium text-rustic-brown">{order.orderDate}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Expected Delivery</p>
-                        <p className="font-medium">{order.expectedDate}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('expectedDelivery')}</p>
+                        <p className="font-medium text-rustic-brown">{order.expectedDate}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="lg:w-48">
+                  <div className="lg:w-48 flex flex-col justify-between items-end">
                     <div className="text-right mb-4">
-                      <div className="text-2xl font-bold text-green-600">₹{order.totalValue}</div>
-                      <div className="text-sm text-gray-500">Total Value</div>
+                      <div className="text-2xl font-heading text-rustic-green">₹{order.totalValue}</div>
+                      <div className="text-sm text-rustic-brown/70 font-body">{t('totalValue')}</div>
                     </div>
 
-                    <div className="flex gap-2">
-                      <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-green-700 transition-colors">
-                        Track Order
-                      </button>
-                      <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors">
-                        Details
-                      </button>
+                    <div className="flex flex-col gap-2 w-full">
+                      <button className="rustic-button-small w-full">{t('trackOrder')}</button>
+                      <button className="rustic-button-secondary-small w-full">{t('details')}</button>
                     </div>
                   </div>
                 </div>
@@ -540,65 +539,61 @@ function Retailer() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {suppliers.map((supplier) => (
-              <div key={supplier.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div key={supplier.id} className="parchment-card p-4 flex flex-col">
                 <div className="flex items-start gap-4 mb-4">
                   <img
                     src={supplier.image}
                     alt={supplier.name}
-                    className="w-16 h-16 object-cover rounded-xl"
+                    className="w-16 h-16 object-cover rounded-xl border-2 border-rustic-brown/20"
                   />
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{supplier.name}</h3>
-                    <p className="text-gray-600 text-sm mb-2">{supplier.location}</p>
+                    <h3 className="text-lg font-heading text-rustic-brown mb-1">{supplier.name}</h3>
+                    <p className="text-rustic-brown/70 text-sm mb-2 font-body">{supplier.location}</p>
                     <div className="flex items-center gap-2">
                       <div className="flex text-yellow-400">
                         {"★".repeat(Math.floor(supplier.rating))}
                       </div>
-                      <span className="text-sm text-gray-600">{supplier.rating}/5</span>
+                      <span className="text-sm text-rustic-brown/70 font-body">{supplier.rating}/5</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">Specialties:</p>
+                <div className="mb-4 font-body">
+                  <p className="text-sm text-rustic-brown/70 mb-2">{t('specialties')}:</p>
                   <div className="flex flex-wrap gap-1">
                     {supplier.specialties.map((specialty) => (
                       <span
                         key={specialty}
-                        className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs"
+                        className="px-2 py-1 bg-rustic-green/20 text-rustic-green rounded-full text-xs"
                       >
-                        {specialty}
+                        {t(specialty)}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                <div className="grid grid-cols-2 gap-4 mb-4 text-sm font-body">
                   <div>
-                    <p className="text-gray-600">Total Orders</p>
-                    <p className="font-medium">{supplier.totalOrders}</p>
+                    <p className="text-rustic-brown/70">{t('totalOrders')}</p>
+                    <p className="font-medium text-rustic-brown">{supplier.totalOrders}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Avg Delivery</p>
-                    <p className="font-medium">{supplier.avgDeliveryTime}</p>
+                    <p className="text-rustic-brown/70">{t('avgDelivery')}</p>
+                    <p className="font-medium text-rustic-brown">{supplier.avgDeliveryTime}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Reliability</p>
-                    <p className="font-medium">{supplier.reliability}%</p>
+                    <p className="text-rustic-brown/70">{t('reliability')}</p>
+                    <p className="font-medium text-rustic-brown">{supplier.reliability}%</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Last Order</p>
-                    <p className="font-medium">{supplier.lastOrder}</p>
+                    <p className="text-rustic-brown/70">{t('lastOrder')}</p>
+                    <p className="font-medium text-rustic-brown">{supplier.lastOrder}</p>
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
-                  <button className="flex-1 bg-green-100 text-green-700 py-2 px-4 rounded-lg text-sm hover:bg-green-200 transition-colors">
-                    Place Order
-                  </button>
-                  <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors">
-                    Contact
-                  </button>
+                <div className="flex gap-2 mt-auto">
+                  <button className="rustic-button-small flex-1">{t('placeOrder')}</button>
+                  <button className="rustic-button-secondary-small">{t('contact')}</button>
                 </div>
               </div>
             ))}
@@ -614,17 +609,17 @@ function Retailer() {
             className="space-y-6"
           >
             {/* Sales Chart */}
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Weekly Sales</h3>
-              <div className="h-64 flex items-end justify-between gap-2">
+            <div className="parchment-card p-4">
+              <h3 className="text-xl font-heading text-rustic-brown mb-6">{t('weeklySales')}</h3>
+              <div className="h-64 flex items-end justify-between gap-2 font-body">
                 {salesData.map((day, index) => (
                   <div key={day.day} className="flex flex-col items-center gap-2">
                     <div 
-                      className="bg-green-500 rounded-t-lg w-12 transition-all duration-500 hover:bg-green-600"
+                      className="bg-rustic-green rounded-t-lg w-12 transition-all duration-500 hover:bg-rustic-green/80"
                       style={{ height: `${(day.sales / 16000) * 200}px` }}
                     ></div>
-                    <span className="text-sm text-gray-600">{day.day}</span>
-                    <span className="text-xs text-gray-500">₹{day.sales.toLocaleString()}</span>
+                    <span className="text-sm text-rustic-brown/80">{day.day}</span>
+                    <span className="text-xs text-rustic-brown/60">₹{day.sales.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -632,37 +627,39 @@ function Retailer() {
 
             {/* Top Products */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Top Selling Products</h3>
-                <div className="space-y-3">
+              <div className="parchment-card p-4">
+                <h3 className="text-lg font-heading text-rustic-brown mb-4">{t('topSellingProducts')}</h3>
+                <div className="space-y-3 font-body">
                   {inventory.slice(0, 5).map((item, index) => (
                     <div key={item.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-bold">
+                        <span className="w-6 h-6 bg-rustic-green/20 text-rustic-green rounded-full flex items-center justify-center text-sm font-bold">
                           {index + 1}
                         </span>
-                        <span className="font-medium">{item.product}</span>
+                        <span className="font-medium text-rustic-brown">
+                          <MultilingualProduct productKey={item.product} />
+                        </span>
                       </div>
-                      <span className="text-sm text-gray-600">₹{item.sellingPrice}/kg</span>
+                      <span className="text-sm text-rustic-brown/80">₹{item.sellingPrice}/kg</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Revenue Breakdown</h3>
-                <div className="space-y-3">
+              <div className="parchment-card p-4">
+                <h3 className="text-lg font-heading text-rustic-brown mb-4">{t('revenueBreakdown')}</h3>
+                <div className="space-y-3 font-body">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Vegetables</span>
-                    <span className="font-medium">₹85,000 (68%)</span>
+                    <span className="text-rustic-brown/80">{t('vegetables')}</span>
+                    <span className="font-medium text-rustic-brown">₹85,000 (68%)</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Fruits</span>
-                    <span className="font-medium">₹25,000 (20%)</span>
+                    <span className="text-rustic-brown/80">{t('fruits')}</span>
+                    <span className="font-medium text-rustic-brown">₹25,000 (20%)</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Herbs</span>
-                    <span className="font-medium">₹15,000 (12%)</span>
+                    <span className="text-rustic-brown/80">{t('herbs')}</span>
+                    <span className="font-medium text-rustic-brown">₹15,000 (12%)</span>
                   </div>
                 </div>
               </div>
@@ -679,47 +676,43 @@ function Retailer() {
             className="space-y-4"
           >
             {qualityIssues.map((issue) => (
-              <div key={issue.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div key={issue.id} className="parchment-card p-4">
                 <div className="flex flex-col lg:flex-row justify-between gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-bold text-gray-900">{issue.product}</h3>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(issue.status)}`}>
-                        {issue.status.toUpperCase()}
+                      <h3 className="text-xl font-heading text-rustic-brown">{issue.product}</h3>
+                      <span className={`px-3 py-1 rounded-full text-sm font-body border ${getStatusColor(issue.status)}`}>
+                        {t(issue.status)}
                       </span>
-                      <span className={`text-sm font-medium ${getPriorityColor(issue.priority)}`}>
-                        {issue.priority.toUpperCase()} PRIORITY
+                      <span className={`text-sm font-body font-bold ${getPriorityColor(issue.priority)}`}>
+                        {t(issue.priority)} {t('priority')}
                       </span>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 font-body">
                       <div>
-                        <p className="text-gray-600 text-sm">Batch ID</p>
-                        <p className="font-medium">{issue.batchId}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('batchId')}</p>
+                        <p className="font-medium text-rustic-brown">{issue.batchId}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Reported By</p>
-                        <p className="font-medium">{issue.reportedBy}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('reportedBy')}</p>
+                        <p className="font-medium text-rustic-brown">{issue.reportedBy}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Issue</p>
-                        <p className="font-medium">{issue.issue}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('issue')}</p>
+                        <p className="font-medium text-rustic-brown">{issue.issue}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 text-sm">Date</p>
-                        <p className="font-medium">{issue.date}</p>
+                        <p className="text-rustic-brown/70 text-sm">{t('date')}</p>
+                        <p className="font-medium text-rustic-brown">{issue.date}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="lg:w-48">
-                    <div className="flex gap-2">
-                      <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                        Investigate
-                      </button>
-                      <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors">
-                        Details
-                      </button>
+                  <div className="lg:w-48 flex flex-col justify-center">
+                    <div className="flex gap-2 w-full">
+                      <button className="rustic-button-small flex-1">{t('investigate')}</button>
+                      <button className="rustic-button-secondary-small">{t('details')}</button>
                     </div>
                   </div>
                 </div>
@@ -731,111 +724,109 @@ function Retailer() {
 
       {/* Create Order Modal */}
       {showOrderModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 font-body">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-2xl"
+            className="parchment-card p-6 w-full max-w-2xl"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Place New Order</h2>
+              <h2 className="text-2xl font-heading text-rustic-brown">{t('placeNewOrder')}</h2>
               <button
                 onClick={() => setShowOrderModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-rustic-brown/70 hover:text-rustic-brown"
               >
                 ✕
               </button>
             </div>
-
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product *
-                  </label>
-                  <select
-                    value={newOrder.product}
-                    onChange={(e) => setNewOrder(prev => ({ ...prev, product: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <option value="">Select Product</option>
-                    <option value="tomatoes">Organic Tomatoes</option>
-                    <option value="carrots">Carrots</option>
-                    <option value="potatoes">Red Potatoes</option>
-                    <option value="apples">Apples</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quantity *
-                  </label>
-                  <input
-                    type="number"
-                    value={newOrder.quantity}
-                    onChange={(e) => setNewOrder(prev => ({ ...prev, quantity: e.target.value }))}
-                    placeholder="25"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Supplier *
-                  </label>
-                  <select
-                    value={newOrder.supplier}
-                    onChange={(e) => setNewOrder(prev => ({ ...prev, supplier: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <option value="">Select Supplier</option>
-                    <option value="gvf">Green Valley Farm</option>
-                    <option value="sof">Sunrise Organic Farm</option>
-                    <option value="mvf">Mountain View Farm</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Expected Delivery Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={newOrder.expectedDate}
-                    onChange={(e) => setNewOrder(prev => ({ ...prev, expectedDate: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Notes
+                <label className="block text-sm font-medium text-rustic-brown/80 mb-2">
+                  {t('product')} *
                 </label>
-                <textarea
-                  value={newOrder.notes}
-                  onChange={(e) => setNewOrder(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="Any special requirements or notes..."
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                <select
+                  value={newOrder.product}
+                  onChange={(e) => setNewOrder(prev => ({ ...prev, product: e.target.value }))}
+                  className="rustic-input"
+                >
+                  <option value="">{t('selectProduct')}</option>
+                  <option value="tomato">{t('product_tomato')}</option>
+                  <option value="carrot">{t('product_carrot')}</option>
+                  <option value="potato">{t('product_potato')}</option>
+                  <option value="apples">{t('product_apples')}</option>
+                </select>
+              </div>
+                
+              <div>
+                <label className="block text-sm font-medium text-rustic-brown/80 mb-2">
+                  {t('quantity')} *
+                </label>
+                <input
+                  type="number"
+                  value={newOrder.quantity}
+                  onChange={(e) => setNewOrder(prev => ({ ...prev, quantity: e.target.value }))}
+                  placeholder="25"
+                  className="rustic-input"
                 />
               </div>
             </div>
 
-            <div className="flex gap-4 pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-sm font-medium text-rustic-brown/80 mb-2">
+                  {t('supplier')} *
+                </label>
+                <select
+                  value={newOrder.supplier}
+                  onChange={(e) => setNewOrder(prev => ({ ...prev, supplier: e.target.value }))}
+                  className="rustic-input"
+                >
+                  <option value="">{t('selectSupplier')}</option>
+                  <option value="gvf">Green Valley Farm</option>
+                  <option value="sof">Sunrise Organic Farm</option>
+                  <option value="mvf">Mountain View Farm</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-rustic-brown/80 mb-2">
+                  {t('expectedDeliveryDate')} *
+                </label>
+                <input
+                  type="date"
+                  value={newOrder.expectedDate}
+                  onChange={(e) => setNewOrder(prev => ({ ...prev, expectedDate: e.target.value }))}
+                  className="rustic-input"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-rustic-brown/80 mb-2">
+                {t('notes')}
+              </label>
+              <textarea
+                value={newOrder.notes}
+                onChange={(e) => setNewOrder(prev => ({ ...prev, notes: e.target.value }))}
+                rows={3}
+                placeholder={t('notesPlaceholder')}
+                className="rustic-input"
+              ></textarea>
+            </div>
+
+            <div className="flex justify-end gap-4 mt-6">
               <button
                 onClick={() => setShowOrderModal(false)}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                className="rustic-button-secondary"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 onClick={handleOrderSubmit}
-                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors"
+                className="rustic-button"
               >
-                Place Order
+                {t('submitOrder')}
               </button>
             </div>
           </motion.div>
@@ -844,61 +835,61 @@ function Retailer() {
 
       {/* Update Pricing Modal */}
       {showPricingModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 font-body">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-md"
+            className="parchment-card p-6 w-full max-w-lg"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Update Pricing</h2>
+              <h2 className="text-2xl font-heading text-rustic-brown">{t('updatePricingFor')} {selectedProduct.product}</h2>
               <button
                 onClick={() => setShowPricingModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-rustic-brown/70 hover:text-rustic-brown"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-bold text-gray-900">{selectedProduct.product}</h3>
-                <p className="text-gray-600">Current: ₹{selectedProduct.sellingPrice}/kg</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Selling Price (₹/kg)
+                <label className="block text-sm font-medium text-rustic-brown/80 mb-2">
+                  {t('costPrice')}
                 </label>
                 <input
                   type="number"
-                  placeholder={selectedProduct.sellingPrice.toString()}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  defaultValue={selectedProduct.costPrice}
+                  className="rustic-input"
                 />
               </div>
-              
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-600">
-                  Cost Price: ₹{selectedProduct.costPrice}/kg
-                </p>
-                <p className="text-sm text-gray-600">
-                  Current Margin: {selectedProduct.margin}%
-                </p>
+              <div>
+                <label className="block text-sm font-medium text-rustic-brown/80 mb-2">
+                  {t('sellingPrice')}
+                </label>
+                <input
+                  type="number"
+                  defaultValue={selectedProduct.sellingPrice}
+                  className="rustic-input"
+                />
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="mt-4">
+              <p className="text-sm text-rustic-brown/80">{t('newMargin')}: <span className="font-bold text-rustic-green">XX.X%</span></p>
+            </div>
+
+            <div className="flex justify-end gap-4 mt-6">
               <button
                 onClick={() => setShowPricingModal(false)}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                className="rustic-button-secondary"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 onClick={handlePricingUpdate}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
+                className="rustic-button"
               >
-                Update Price
+                {t('updatePrice')}
               </button>
             </div>
           </motion.div>

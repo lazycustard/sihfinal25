@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useI18n } from "../i18n/I18nContext";
 
 function Login() {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -43,17 +45,17 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-amber-50">
+    <div className="min-h-screen textured-bg farm-bg font-body">
       <header className="bg-white shadow-sm border-b border-green-100">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">🌱</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">FarmTrace</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('app_name')}</h1>
           </div>
           <Link to="/" className="text-green-600 hover:text-green-700 font-medium">
-            Home
+            {t('nav_home')}
           </Link>
         </div>
       </header>
@@ -68,7 +70,7 @@ function Login() {
                 }`}
                 onClick={() => setActiveTab("login")}
               >
-                Login
+                {t('login_tab')}
               </button>
               <button
                 className={`flex-1 py-3 text-center font-medium ${
@@ -76,19 +78,19 @@ function Login() {
                 }`}
                 onClick={() => setActiveTab("signup")}
               >
-                Sign Up
+                {t('signup_tab')}
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('username')}</label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="Enter username"
+                  placeholder={t('placeholder_username')}
                   required
                 />
               </div>
@@ -96,31 +98,31 @@ function Login() {
               {activeTab === "signup" && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="you@example.com"
+                      placeholder={t('placeholder_email')}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="+91-9876543210"
+                      placeholder={t('placeholder_phone')}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('role_label')}</label>
                     <select
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
@@ -137,13 +139,13 @@ function Login() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('password')}</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="••••••••"
+                  placeholder={t('placeholder_password')}
                   required
                 />
               </div>
@@ -157,18 +159,18 @@ function Login() {
                 disabled={isLoading}
                 className="w-full py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Please wait..." : (activeTab === "login" ? "Log In" : "Create Account")}
+                {isLoading ? t('please_wait') : (activeTab === "login" ? t('submit_login') : t('submit_signup'))}
               </button>
 
               {activeTab === "login" && (
                 <p className="text-sm text-center text-gray-600">
-                  Don’t have an account?{" "}
+                  {t('no_account')} {" "}
                   <button
                     type="button"
                     className="text-green-700 font-medium hover:underline"
                     onClick={() => setActiveTab("signup")}
                   >
-                    Sign up
+                    {t('sign_up_cta')}
                   </button>
                 </p>
               )}
