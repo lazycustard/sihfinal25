@@ -1,4 +1,4 @@
-.
+
 # 🌱 FarmTrace - Blockchain Product Traceability System
 
 A comprehensive blockchain-based product traceability system for agricultural supply chains, ensuring transparency from farm to consumer.
